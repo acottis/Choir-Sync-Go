@@ -15,10 +15,11 @@ import (
 )
 
 type song struct {
-	song       string
-	part       string
-	recordable bool
-	secret     bool
+	Song       string `json:"song"`
+	Part       string `json:"part"`
+	Recordable bool   `json:"recordable"`
+	Secret     bool   `json:"secret"`
+	Url        string `json:"url"`
 }
 
 // Creates a bucket if it does not already exist
@@ -65,42 +66,54 @@ func GetSongsInBucket(bucketName string) ([]song, error) {
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
+	bucket := client.Bucket(bucketName)
 
-	it := client.Bucket(bucketName).Objects(ctx, nil)
+	// Check if bucket exists
+	_, err = bucket.Attrs(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	var songs []song
+	it := bucket.Objects(ctx, nil)
 	for {
-		if bucketAttrs, e := it.Next(); e != nil {
+		if objectAttrs, e := it.Next(); e != nil {
 			break
 		} else {
-			tmp := strings.Split(bucketAttrs.Name, "_")
+			// Skip items that are not mpeg's
+			if objectAttrs.ContentType != "audio/mpeg" {
+				continue
+			}
+			var tmp []string
+			// Parse out just the last part in the full file path
+			tmp = strings.Split(objectAttrs.Name, "/")
+			rawFileName := tmp[len(tmp)-1]
+
+			// Split the song from the Parts
+			tmp = strings.Split(rawFileName, "_")
+
 			// If the Name does not include a "_" skip the object
 			if len(tmp) == 1 {
 				continue
 			}
+			songName := tmp[0]
 			part := strings.Split(tmp[1], ".")[0]
-
-			var recordable bool
-			if bucketAttrs.Metadata["norec"] == "true" {
-				recordable = true
-			} else {
-				recordable = false
-			}
-			var secret bool
-			if bucketAttrs.Metadata["secret"] == "true" {
-				secret = true
-			} else {
-				secret = false
-			}
+			recordable := (objectAttrs.Metadata["recordable"] == "true")
+			secret := (objectAttrs.Metadata["secret"] == "true")
+			url := fmt.Sprintf(
+				"https://storage.googleapis.com/%s/%s",
+				bucketName,
+				objectAttrs.Name,
+			)
 			songs = append(songs, song{
-				song:       bucketAttrs.Name,
-				part:       part,
-				recordable: recordable,
-				secret:     secret,
+				Song:       songName,
+				Part:       part,
+				Recordable: recordable,
+				Secret:     secret,
+				Url:        url,
 			})
 		}
 	}
-
 	return songs, nil
 }
 

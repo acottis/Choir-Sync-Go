@@ -1,3 +1,150 @@
+<!DOCTYPE html>
 <html>
-    <h1>Testing</h1>
+    <head>
+        <title>Còisir Ghàidhlig Shruighlea Music Site</title>
+        <link rel="stylesheet" href="styles.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+    </head>
+
+    <body>
+        <div id = "welcome">
+            <form id="form_authenticate">
+                <h1>Please enter a password</h1>
+                <input type="text" id="password_entered" autofocus="autofocus">
+                <br><br>
+                <input type="submit" id="button_authenticate" isdefault="true" value ="Enter" class="big_button">
+            </form>
+            <p>If you have trouble logging in, try using a different browser (e.g. Chrome, Edge) or updating your browser to the latest version.</p>
+        </div>
+
+        <div id="requires_password">
+
+            <div id = "buttons">
+                <button id="want_sim" class="big_button">I want to practise (simple player)</button>
+                <button id="want_adv" class="big_button">I want to practise (stereo player)</button>
+                <button id="want_rec" class="big_button">I want to record</button>
+            </div>
+
+            <div id="choose" class="sim adv rec">
+                <h1>Select a backing track</h1>
+                <label for="choose_song">Choose a song:</label>
+                <select id="choose_song">
+                    <option value="blank">-----</option>
+                </select>
+                <br>
+                <div class="sim rec yes_record">
+                    <label for="choose_track">Choose a track:</label>
+                    <select id="choose_track">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                </div>
+                <div class="adv">
+                    <div class="half">
+                        <label for="choose_trackL">Choose a track for your LEFT ear:</label>
+                        <br>
+                        <select id="choose_trackL">
+                            <option value="blank">None</option>
+                        </select>
+                    </div>
+                    <div class="half">
+                        <label for="choose_trackR">Choose a track for your RIGHT ear:</label>
+                        <br>
+                        <select id="choose_trackR">
+                            <option value="blank">None</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="practice" class="sim adv">
+                <div class="sim">
+                    <audio crossorigin="anonymous" controls id="backing_player"></audio>
+                </div>
+                <div class="adv">
+                    <audio crossorigin="anonymous" controls id="dual_player1"></audio> 
+                    <audio crossorigin="anonymous" id="dual_player2"></audio>
+                    <div class="player_text">
+                        <p>Before you use this stereo player, please check that you are using head/earphones which can play stereo sound, and that left and right are the right way around. <a href="https://www.youtube.com/watch?v=YwNs1Z0qRY0" target="_blank" rel="noopener noreferrer">Click here to watch a youtube video to check.</a></p>
+                        <p>If the tracks are out of sync on timing, volume or speed, pause and play again to line them back up.</p>
+                    </div>
+                </div>
+                <div class="player_text">
+                    <p>In some browsers (e.g. Chrome, Edge) you will see a a 3-dot icon on the player, which will let you speed up or slow down the track.</p>
+                </div>
+            </div>
+            <div class="adv safari">
+                <p>Sorry, the stereo player doesn't work on Safari, which is the default browser for iPhone, iPad and Mac. If you can, try another browser like <a href="https://www.google.com/intl/en_uk/chrome/" target="_blank" rel="noopener noreferrer">Chrome</a>, <a href ="https://www.microsoft.com/en-us/edge" target="_blank" rel="noopener noreferrer">Edge</a> or <a href ="https://www.mozilla.org/en-GB/firefox/new/" target="_blank" rel="noopener noreferrer">Firefox</a>. Otherwise, you can still use the simple player.</p>
+            </div>
+
+            <div class="rec">
+
+                <div class="yes_record">
+                    <button id="button_rec_test"><b>Test</b> (records a few seconds and plays it back)</button>
+                    <br>
+                    <button id="button_rec" class="big_button">Record</button>
+                    <button id="button_stop_rec" class="big_button">Stop</button>
+                </div>
+                <div class="no_record">
+                    <p>Sorry, this song isn't ready for recording, but you can still listen and practise with the other buttons!</p>
+                </div>
+
+                <div id="info" class="half">
+                    <h1>Instructions for recording</h1>
+                    <p>Recording works best if you use a computer or laptop. If you need to though, you can use a tablet or phone. If something's not working, try using a different browser (e.g. Chrome, Edge) or updating your browser to the latest version.</p>
+                    <p>Please do a quick test recording first to check you don’t have any problems with your setup, and check the troubleshooting guide below if it didn't sound right. Make sure you use head/earphones so that the recording will only pick up your voice and not the backing track playing out of speakers.</p>
+                    <p>The record button will turn red to show you're recording. Your recordings will show up on the right. You can do as many takes as you like, listen back to them, and then send on your favourite. I’ll only be able to see the ones you choose to send on.</p>
+                    <p>You can record along to any track you like, whether that’s your own part, another part, or a track with all parts.</p>
+                    <p>Thanks!</p>
+
+                    <h2 class="red">Important</h2>
+                    <p class="red">The recordings are <b>only saved while you stay on choir.ashdown.scot!</b> You can switch between the practise and record buttons at the top, but if you leave this site altogether or refresh the page, they will be gone. Until you send a recording it is not saved anywhere, and there is no way to get it back. So please make sure you send a recording when you’re done.</p>
+                    
+                    <h2>Troubleshooting</h2>
+                    <p>Do you know where your microphone is? It might not be where you expect!</p>
+                    <ul>
+                        <li>If you’re recording on a computer, you might have more than one microphone you can choose between.</li>
+                        <ul class="sublist">
+                            <li>Laptop microphones are usually at the top next to the camera, or along the top of the keyboard.</li>
+                            <li>Head/earphones that have a volume control or a little block on the wire often have a microphone there too</li>
+                            <li>Built-in phone/tablet microphones are often on the bottom near the charging socket</li>
+                        </ul>
+                        <li>If you’re not sure where your microphone is or which one you're using, try making a recording where you tap each place you think it might be, narrating as you go. When you listen back to it you should hear something like ‘Here’s the earphone volume controls <i class="mini">tap tap tap</i> and this is the top of the keyboard <i class="mini">tap tap tap</i> and this is next to the camera <b>TAP! TAP! TAP!</b>’</li>
+                        <li>On a computer, if you have more than one microphone you should be able to change between them in the computer settings. Here's how to do this for <a href="https://support.microsoft.com/en-us/windows/how-to-set-up-and-test-microphones-in-windows-10-ba9a4aab-35d1-12ee-5835-cccac7ee87a4" target="_blank" rel="noopener noreferrer">Windows</a> and for <a href="https://support.apple.com/en-gb/guide/mac-help/mchlp2567/mac" target="_blank" rel="noopener noreferrer">Mac</a>. (The links will open in a new tab so your recordings are safe.)</li>
+                    </ul>
+                    <p>If you’re hearing the backing track as well as your voice:</p>
+                    <ul>
+                        <li>Try different head/earphones</li>
+                        <li>Check where your microphone is and that it's not too close to the speakers in your head/earphones</li>
+                        <li>Turn down the output volume</li>
+                        <li>This one might sound a bit crazy, but: try plugging in your head/earphones only part-way, to where they're not fully 'clicked in'!</li>
+                    </ul>
+                    <p>If you can’t hear your voice very clearly:</p>
+                    <ul>
+                        <li>Try different head/earphones</li>
+                        <li>Check where your microphone is and make sure you’re singing close to it</li>
+                    </ul>
+                    <p>If you’ve got too much background noise:</p>
+                    <ul>
+                        <li>Try different head/earphones</li>
+                        <li>Move to a quiet room if you can</li>
+                        <li>Small rooms with carpets, curtains and lots of soft furnishings are best</li>
+                        <li>Professionals recording at home sometimes even sit under a duvet or in a cupboard full of clothes!</li>
+                    </ul>
+                </div>
+
+                <div id="recordings_area" class="half">
+                    <h1>Recordings</h1>
+                    <p id="remove_first_rec">Nothing here yet!</p>
+                </div>
+            
+            </div>
+
+        </div>
+
+        <script type="module" src="log_in.js"></script>
+        <script type="module" src="choose_song.js"></script>
+        <script type="module" src="record.js"></script>
+
+    </body>
 </html>

@@ -1,0 +1,101 @@
+html,body{
+    font-family:Verdana,sans-serif;
+}
+h1{font-size:20px}
+h2{font-size: 17px}
+ul:not(.sublist){margin-top: -10px}
+a{
+    color: grey;
+    text-decoration-style: dotted;
+}
+
+.red{color: red;}
+.mini{font-size: 10px}
+
+#requires_password,.no_record,.sim,.adv,.rec{
+    display: none;
+}
+
+#welcome{
+    padding: 70px 0;
+    text-align: center;
+}
+#password_entered{
+    font-size:17px;
+}
+
+#choose{
+    padding: 20px 0;
+    font-size: 20px;
+}
+select{
+    font-size: 20px;
+}
+
+#buttons,#choose,#practice,.yes_record,.no_record,.safari{
+    text-align: center;
+}
+#practice{
+    padding: 20px 0;
+}
+.player_text,.safari{
+    font-size: 14px;
+}
+.no_record{
+    padding: 50px 0 0;
+}
+#info{
+    padding: 20px;
+    border-right: 2px solid;
+    font-size: 14px;
+}
+#recordings_area{
+    padding: 20px;
+    font-size: 13px;
+}
+.recording{
+    padding: 0 0 20px 0;
+}
+.recording_name{
+    margin-block: 0;
+    font-weight: bold;
+}
+.recording_time{
+    margin-block: 0;
+    padding: 0 0 5px 0;
+}
+
+.half{
+    float:left;
+    width:100%
+}
+@media (min-width:601px){
+    .half{
+        width:49.99999%;
+        box-sizing: border-box;
+    }
+}
+
+.row:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+button,.big_button,.rec_button{
+    background-color: grey;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    font-family: Verdana,sans-serif;
+}
+button{
+    padding: 2px;
+    font-size:13px;
+    margin: 5px 10px 5px 0px;
+  }
+.big_button{
+    padding: 5px;
+    font-size:17px;
+    font-weight: bold
+}
