@@ -187,7 +187,7 @@ const change_track = (player) => {
             dual_player1.pause()
             dual_player1.currentTime=0
             if(dual_player1.src==""){
-                change_track("blank", "L")
+                change_track("L")
             }
     }
 }
