@@ -156,50 +156,62 @@ song_name_choose.onchange = function (){
     }
 }
 
-const change_track = (player) => {
+const change_track = (part_choice, player) => {
 
-    // Get the currently selected song
+    // Handle edge case where user has not select part during recording
+    if (player === "main"){
+        if (part_choice === "") {
+            song_is_chosen = false
+        }else{
+            song_is_chosen = true
+        }
+    }
+
+    // Get the song object from our global array based on the user choices
     const song = all_song_list.find(song => {
         // Return the first match of the song name and part matching
-        return song.part === singing_part_choose.value &&
+        return song.part === part_choice &&
             song.song === song_name_choose.value
     })
-    /// TODO - Handle undefined if song not found!
+    // If we get here from selecting `None` in the GUI remove the song from
+    // the media player
+    const song_url = (song === undefined) ? "" : song.url;
 
     switch(player){
         case "main":
-            backing_player.setAttribute("src", song.url)
-            break;
+            // Get the currently selected song
+            backing_player.setAttribute("src", song_url)
+            break
         case "L":
-            if(song.url == ""){
+            if(song_url === ""){
                 dual_player1.setAttribute("src", dual_player2.src)
                 dual_player2.muted=true
                 switch_channels=true
             }
             else{
-                dual_player1.setAttribute("src", song.url)
+                dual_player1.setAttribute("src", song_url)
                 switch_channels=false
             }
             dual_player2.pause()
             break;
         case "R":
-            dual_player2.setAttribute("src", song.url)
+            dual_player2.setAttribute("src", song_url)
             dual_player1.pause()
             dual_player1.currentTime=0
-            if(dual_player1.src==""){
-                change_track("L")
+            if(dual_player1.src === ""){
+                change_track("blank", "L")
             }
     }
 }
 
 singing_part_choose.onchange = function (){
-    change_track("main")
+    change_track(singing_part_choose.value, "main")
 }
 singing_part_chooseL.onchange = function (){
-    change_track("L")
+    change_track(singing_part_chooseL.value, "L")
 }
 singing_part_chooseR.onchange = function (){
-    change_track("R")
+    change_track(singing_part_chooseR.value, "R")
 }
 
 backing_player.addEventListener("play", event => {
