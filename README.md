@@ -5,6 +5,7 @@
 * To authenticate to gcloud while testing locally run `gcloud auth application-default login`
 * To run server locally `go run main.go`
 * Default port is `8080` unless you set the `PORT` environment variable
+* Environment variable GOOGLE_CLOUD_PROJECT is set to project name, for example: `$env:GOOGLE_CLOUD_PROJECT="choir-sync-go"`
 
 ## Deploy
 

@@ -42,7 +42,13 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("Defaulting to port %s", port)
+		log.Printf("Defaulting to port %s, http://localhost:8080", port)
+	}
+
+	// Ensure the project exists in the environment variables
+	project := os.Getenv("GOOGLE_CLOUD_PROJECT")
+	if project == "" {
+		log.Fatal("GOOGLE_CLOUD_PROJECT environment variable is not set")
 	}
 
 	// Serve our static files to the root directory
