@@ -23,7 +23,7 @@ type song struct {
 }
 
 // Creates a bucket if it does not already exist
-func CreateBucket(bucketName string) error {
+func CreateBucket(bucketName string, projectName string) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 	if err != nil {
@@ -39,7 +39,7 @@ func CreateBucket(bucketName string) error {
 	bucket := client.Bucket(bucketName)
 	if err := bucket.Create(
 		ctx,
-		os.Getenv("GOOGLE_CLOUD_PROJECT"),
+		projectName,
 		buckattrs,
 	); err != nil {
 		var e *googleapi.Error
