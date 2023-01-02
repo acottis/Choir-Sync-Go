@@ -59,7 +59,7 @@ func CreateBucket(bucketName string, projectName string) error {
 }
 
 // Parse and return the songs from the bucket
-func GetSongsInBucket(bucketName string) ([]song, error) {
+func GetSongsInBucket(bucketName string, groupName string) ([]song, error) {
 	ctx := context.Background()
 
 	client, err := storage.NewClient(ctx)
@@ -99,19 +99,24 @@ func GetSongsInBucket(bucketName string) ([]song, error) {
 			songName := tmp[0]
 			part := strings.Split(tmp[1], ".")[0]
 			recordable := (objectAttrs.Metadata["recordable"] == "true")
+			//to implement: groups rather than boolean secret
+			//group := (objectAttrs.Metadata["group"])
 			secret := (objectAttrs.Metadata["secret"] == "true")
 			url := fmt.Sprintf(
 				"https://storage.googleapis.com/%s/%s",
 				bucketName,
 				objectAttrs.Name,
 			)
-			songs = append(songs, song{
-				Song:       songName,
-				Part:       part,
-				Recordable: recordable,
-				Secret:     secret,
-				Url:        url,
-			})
+			//to implement: groups rather than boolean secret
+			//if group == groupName {
+			if (groupName == "Secret" && secret) || (groupName == "SGC" && !secret) {
+				songs = append(songs, song{
+					Song:       songName,
+					Part:       part,
+					Recordable: recordable,
+					Url:        url,
+				})
+			}
 		}
 	}
 	return songs, nil

@@ -20,6 +20,9 @@ const PROJECTNAME string = "choir-sync-go"
 // Store our password in memory that we fetch from google secret manager
 // storing as global so we can access from our handlers
 var standardPassword string
+var secretPassword string
+var discordEndpoint string
+var groupName string
 
 // Our json respone schema
 type response struct {
@@ -33,6 +36,14 @@ type password struct {
 func init() {
 	var err error
 	standardPassword, err = getSecretPayload("standard-password", "1")
+	if err != nil {
+		panic(err)
+	}
+	secretPassword, err = getSecretPayload("secret-password", "1")
+	if err != nil {
+		panic(err)
+	}
+	discordEndpoint, err = getSecretPayload("discord-endpoint", "1")
 	if err != nil {
 		panic(err)
 	}
@@ -127,7 +138,7 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 
 	// Check user is authenticated
 
-	songs, err := cloudstorage.GetSongsInBucket(bucketName)
+	songs, err := cloudstorage.GetSongsInBucket(bucketName, groupName)
 	if err != nil {
 		log.Print(err)
 		res = response{Message: "Failed to get songs"}
@@ -150,7 +161,7 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// Check an incomming message has the correct password
+// Check an incoming message has the correct password
 func authenticate(req *http.Request) error {
 
 	// Decode the body
@@ -161,12 +172,16 @@ func authenticate(req *http.Request) error {
 		// If the JSON does not meed out schema
 		return fmt.Errorf("auth_error: failed to parse authentication request")
 	}
-	// Bad password
-	if password.Password != standardPassword {
+
+	if password.Password == standardPassword { // Good Passwords
+		groupName = "SGC"
+	} else if password.Password == secretPassword {
+		groupName = "Secret"
+	} else { // Bad password
 		log.Printf("Bad password from: %s", req.RemoteAddr)
 		return fmt.Errorf("auth_error: bad password")
 	}
-	// Good Password
+
 	return nil
 }
 

@@ -249,7 +249,7 @@ const send_recording = (recording) => {
             fd.append('message', message)
             fd.append('password', password_entered)
 
-            fetch(`/api/v0/recording`, {
+            fetch(`/api/v1/uploadrecording`, {
                 method: "post",
                 body: fd
             })
