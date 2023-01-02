@@ -6,27 +6,35 @@
     </head>
 
     <body>
-        <div id = "welcome">
-            <form id="form_authenticate" class="admin">
-                <h1 class="red">Please enter the admin password</h1>
-                <input type="text" id="password_entered" autofocus="autofocus">
-                <br><br>
-                <input type="submit" id="button_authenticate" isdefault="true" value ="Enter" class="big_button">
-            </form>
+        <div id="wrap">
+
+            <div id = "welcome">
+                <form id="form_authenticate" class="admin">
+                    <h1 class="red">Please enter the admin password</h1>
+                    <input type="text" id="password_entered" autofocus="autofocus">
+                    <br><br>
+                    <input type="submit" id="button_authenticate" isdefault="true" value ="Enter" class="big_button">
+                </form>
+            </div>
+
+            <div id="requires_password">
+                <div id="initial">
+                    <button id="uploadbutton">Upload a new track</button>
+                    <br>
+                    <button id="modifybutton">Modify/delete an existing track</button>
+                </div>
+                <div id="uploaddiv">
+                    
+                </div>
+                <div id="modifydiv">
+
+                </div>
+            </div>
+            
         </div>
 
-        <div id="requires_password">
-            <div id="initial">
-                <button id="uploadbutton">Upload a new track</button>
-                <br>
-                <button id="modifybutton">Modify/delete an existing track</button>
-            </div>
-            <div id="uploaddiv">
-                
-            </div>
-            <div id="modifydiv">
-                
-            </div>
+        <div id="switch_site">
+            <a href="index.html">Back to main page</a>
         </div>
     </body>
 
