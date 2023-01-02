@@ -1,18 +1,18 @@
-import {backing_track_file, song_name, singing_part, song_is_chosen, backing_audio_playing, mimetype_chosen} from "/choose_song.js"
+import {backing_track_file, song_name, singing_part, song_is_chosen, mimetype_chosen} from "/choose_song.js"
 import {password_entered} from "/log_in.js"
 
 const button_rec = document.getElementById("button_rec")
 const button_rec_test = document.getElementById("button_rec_test")
 const button_stop_rec = document.getElementById("button_stop_rec")
 const recordings_area = document.getElementById("recordings_area")
-const practice_area = document.getElementById("practice")
 
 let record_mode = false
 let recordings = []
 let rec_audio_playing = false
+let test_timeout
 
-const start_recording = (test_only) => {
-    if (backing_audio_playing || rec_audio_playing){
+const do_recording = (test_only) => {
+    if (rec_audio_playing){
         alert("Recording not started, please pause music first")
     }
     else if (!song_is_chosen){
@@ -30,12 +30,10 @@ const start_recording = (test_only) => {
             button_rec_use = button_rec
         }
         button_rec_use.style.backgroundColor = "red"
-        practice_area.style.visibility = "hidden";
         const timers = {};
 
         timers["AudioLoad"] = new Date();
         const backing_track = new Audio(backing_track_file);
-        timers["AudioLoaded"] = new Date();
 
         backing_track.addEventListener("loadeddata", event => {
             timers["AudioLoaded"] = new Date();
@@ -44,14 +42,10 @@ const start_recording = (test_only) => {
             }
         })
 
-        //let ready_to_play
-        backing_track.addEventListener("canplaythrough", event =>{
-            timers["CanplayListenerOut"] = new Date();
-            //ready_to_play = true
-            recording_process()
-        })
-
         const recording_process = () =>{
+            timers["CanplayListenerOut"] = new Date();
+            backing_track.removeEventListener("canplaythrough", recording_process)
+
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(stream => {
 
@@ -69,9 +63,10 @@ const start_recording = (test_only) => {
                         mediaRecorder.start();
                         timers["RecordStarted"] = new Date();
                         if (test_only){
-                            setTimeout(function(){
+                            test_timeout = setTimeout(function(){
                                 if (mediaRecorder.state == "recording"){
                                     stop_recording()
+                                    timers["TestTimeout"] = new Date();
                                 }
                             },
                             7000);
@@ -84,17 +79,6 @@ const start_recording = (test_only) => {
                         backing_track.pause();
                         timers["AudioPaused"] = new Date();
                     }
-
-                    // if (ready_to_play){
-                    //     timers["CheckedReady"] = new Date();
-                    //     start_recording()                        
-                    // }
-                    // else{
-                    //     backing_track.addEventListener("canplaythrough", event => {
-                    //         timers["CanplayListenerIn"] = new Date();
-                    //         start_recording()
-                    //     })
-                    // }
 
                     mediaRecorder.addEventListener("dataavailable", event => {
                         timers["DataAvailable"] = new Date();
@@ -122,10 +106,13 @@ const start_recording = (test_only) => {
                         const audioUrl = URL.createObjectURL(recording_blob);
 
                         if (test_only){
+                            clearTimeout(test_timeout)
                             const test_recording = new Audio(audioUrl);
                             button_rec_test.style.backgroundColor = "blue"
-                            test_recording.play()                    
+                            test_recording.play()    
+                            timers["TestPlay"] = new Date();                
                             test_recording.addEventListener("ended", event => {
+                                timers["TestFinish"] = new Date();
                                 finish_off()
                             })
                         }
@@ -155,12 +142,12 @@ const start_recording = (test_only) => {
                 });
 
         }
+        backing_track.addEventListener("canplaythrough", recording_process)
         
         const finish_off = () =>{
-            //log_times(timers);
+            //log_times(timers); //uncomment for testing
             button_rec_use.style.backgroundColor = null
             button_stop_rec.onclick = null
-            practice_area.style.visibility = null
             record_mode = false
         }
     }
@@ -294,10 +281,10 @@ const delete_recording = (id) => {
 }
 
 button_rec.onclick = function(){
-    start_recording(false)
+    do_recording(false)
 }
 button_rec_test.onclick = function(){
-    start_recording(true)
+    do_recording(true)
 }
 
 const log_times = (timers) =>{
