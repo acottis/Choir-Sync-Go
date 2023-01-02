@@ -46,7 +46,13 @@ const do_recording = (test_only) => {
             timers["CanplayListenerOut"] = new Date();
             backing_track.removeEventListener("canplaythrough", recording_process)
 
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            navigator.mediaDevices.getUserMedia({
+                    audio:{ 
+                    channels: 1, 
+                    autoGainControl: false, 
+                    echoCancellation: false, 
+                    noiseSuppression: true 
+                } })
                 .then(stream => {
 
                     const audioChunks = [];
@@ -233,7 +239,7 @@ const send_recording = (recording) => {
     if (response_text != "cancelled"){
         if (confirm(response_text)){
 
-            let safari_mobile_flag
+            let safari_mobile_flag = ""
             if (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")){
                 safari_mobile_flag = safari_mobile_flag + "_safari"
             }
@@ -242,24 +248,28 @@ const send_recording = (recording) => {
             }
 
             const date_id = new Date(Date.now())
+            let date_string = date_id.toISOString()
+            date_string = date_string.split(".")[0]
+            date_string = date_string.replaceAll(":","")
 
             const fd = new FormData();
-            fd.append('recording', recording.blob, `${send_song_name}_${singer_name}_${send_singing_part}_${date_id.toISOString()}${safari_mobile_flag}.mp3`)
+            fd.append('recording', recording.blob)
+            fd.append('file_name', `${send_song_name}_${singer_name}_${send_singing_part}_${date_string}${safari_mobile_flag}.mp3`)
             fd.append('singer_name', singer_name)
             fd.append('message', message)
             fd.append('password', password_entered)
 
-            fetch(`/api/v0/recording`, {
+            fetch(`/api/v1/uploadrecording`, {
                 method: "post",
                 body: fd
             })
-            .then( res => res.json() )
-            .then ( json_response => {
-                if (json_response.status == "success"){
+            .then( res => {
+                if (res.status == 200){
                     alert(`Recording received, thank you ${singer_name}!`)
-                }
-                else{
-                    alert(`Sorry, there was an error: "${json_response.message}"`)
+                }else{
+                    res.json().then( body => {
+                        alert(`Sorry, there was an error: "${body.message}"`)
+                    })
                 }
 
             });

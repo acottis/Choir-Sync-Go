@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Còisir Ghàidhlig Shruighlea Music Site</title>
+        <link rel="stylesheet" href="/styles.css">
+    </head>
+
+    <body>
+        <div id="wrap">
+
+            <div id = "welcome">
+                <form id="form_authenticate" class="admin">
+                    <h1 class="red">Please enter the admin password</h1>
+                    <input type="text" id="password_entered" autofocus="autofocus">
+                    <br><br>
+                    <input type="submit" id="button_authenticate" isdefault="true" value ="Enter" class="big_button">
+                </form>
+            </div>
+
+            <div id="requires_password">
+                <div id="buttons">
+                    <button id="uploadsongbutton" class="big_button">Create a new song</button>
+                    <br>
+                    <button id="uploadtrackbutton" class="big_button">Upload a new track for an existing song</button>
+                    <br>
+                    <button id="modifysongbutton" class="big_button">Modify/delete a song</button>
+                    <br>
+                    <button id="modifytrackbutton" class="big_button">Modify/delete a single track</button>
+                    <br>
+                </div>
+
+                <div id="uploadsongdiv">
+                    <h1>Select an option</h1>
+                    <button id="new_s_norec">Create a new song for practising only</button>
+                    <button id="new_s_rec">Create a new song for practising and recording</button>
+                    
+                    <div id="info">
+                        <p>Music files must be .mp3, the maximum size is 8MB (around 8 minutes of music).</p>
+                        <p>If you are uploading music to be used just for practising, any music is fine.</p>
+                        <p>However, if you want to be able to record a song on this site, here are some rules and guidelines to consider:</p>
+                        <ul>
+                            <li>All tracks must be aligned, so that if you pressed play on all parts at the same time you would hear the whole song in sync. Without this, it is very difficult to merge together singers' recordings.</li>
+                            <li>There should be a metronome or backing track intro, so the singer can come in at the right time and at the right tempo.</li>
+                            <li>Similarly, it's a good idea to play the part's starting note at the beginning.</li>
+                            <li>It's also good to have a metronome or backing track through the whole song, so the singer can keep in time even if their part is silent or has long held notes.</li>
+                            <li>Try to avoid tempo changes like rubato and pauses in songs you want to record. It's very difficult for all singers to sing these in sync, when there's no conductor.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="uploadtrackdiv">
+                    <h1>Select a song</h1>
+                    <label for="choose_song_u">Choose a song:</label>
+                    <select id="choose_song_u" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button id="new_t">Upload a new track</button>
+                    <p class="player_text">Music files must be .mp3, the maximum size is 8MB (around 8 minutes of music).</p>
+                </div>
+
+                <div id="modifysongdiv">
+                    <h1>Select a song</h1>
+                    <label for="choose_song_s">Choose a song:</label>
+                    <select id="choose_song_s" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button id="rename_s">Rename song</button>
+                    <button id="delete_s">Delete song</button>
+                    <br>
+                    <p class="player_text">A song can be set to 'recordable' or 'not recordable' when it is newly uploaded. If you want to change whether a song can be recorded, please delete the song and re-upload all tracks.</p>
+                </div>
+
+                <div id="modifytrackdiv">
+                    <h1>Select a track</h1>
+                    <label for="choose_song_t">Choose a song:</label>
+                    <select id="choose_song_t" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <label for="choose_track">Choose a track:</label>
+                    <select id="choose_track">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button id="rename_t">Rename track</button>
+                    <button id="change_t">Change sound file</button>
+                    <button id="delete_t">Delete track</button>
+                    <p class="player_text">Music files must be .mp3, the maximum size is 8MB (around 8 minutes of music).</p>
+                </div>
+
+                <input id="new_track" type="file" accept=".mp3">
+                <div id="endinfo">
+                    <p class="player_text">Once you have finished making changes, please click the link at the bottom to go to the main page, and check it has all worked as you expected.</p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="switch_site">
+            <a href="/">Back to main page</a>
+        </div>
+    </body>
+
+    <script type="module" src="/log_in.js"></script>
+    <script type="module" src="do_admin.js"></script>
+</html>

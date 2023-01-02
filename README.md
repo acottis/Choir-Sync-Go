@@ -18,6 +18,4 @@ Issue with the media player required us to set a more permissive cors policy. Th
 ## TODO
 
 * Implement pipeline
-* Elevated password
 * Test deployed
-* Switch over to go version from node

@@ -1,4 +1,4 @@
-import {password_entered} from "/log_in.js"
+import {all_song_list} from "/log_in.js"
 
 const want_sim = document.getElementById("want_sim")
 const want_adv = document.getElementById("want_adv")
@@ -18,7 +18,6 @@ const advdivs = document.querySelectorAll('.adv')
 const safaridivs = document.querySelectorAll('.safari')
 const recdivs = document.querySelectorAll('.rec')
 
-let all_song_list = []
 let recordable = true
 let on_rec_tab
 let is_safari
@@ -39,48 +38,14 @@ if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('
     is_safari = true
 }
 
-export const set_up_songs = async () => {
-    get_songs().then ( password_correct => {
-        if (password_correct) {
-            change_song_names()
-        }
-    })
-    
-    if(MediaRecorder.isTypeSupported("audio/webm")){
-        mimetype_chosen = "mimeType: audio/webm"
-    }
-    else if(MediaRecorder.isTypeSupported("audio/mpeg")){
-        mimetype_chosen = "mimeType: audio/mpeg"
-    }
-    else{
-        mimetype_chosen = ""
-    }
+if(MediaRecorder.isTypeSupported("audio/webm")){
+    mimetype_chosen = "mimeType: audio/webm"
 }
-
-const get_songs = () => {
-    return new Promise (resolve =>{
-        const password_send = {password: password_entered}
-        fetch(`/api/v1/getsongs`, {
-            method: "post",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(password_send)
-        })
-        .then( res => {
-            if (res.status == 200){
-                res.json().then( res => {
-                    all_song_list = res
-                    resolve(true)
-                })
-            }else{
-                alert(
-                    "Server could not fetch songs, please contact administrator"
-                )
-                resolve(false)
-            }
-        })
-    })
+else if(MediaRecorder.isTypeSupported("audio/mpeg")){
+    mimetype_chosen = "mimeType: audio/mpeg"
+}
+else{
+    mimetype_chosen = ""
 }
 
 song_name_choose.onchange = function (){
@@ -93,26 +58,6 @@ song_name_choose.onchange = function (){
     if (on_rec_tab){
         rec_tab_show_divs()
     }
-}
-
-const change_song_names = () => {
-    let song_list = []
-    all_song_list.forEach(track => {
-        if ( !(song_list.some(song => song.name == track.song)) ) {
-            song_list.push({
-                name: track.song,
-                recordable: track.recordable,
-            })
-        }
-    })
-    song_list.forEach(song => {
-        const option = document.createElement("option");
-        option.text = song.name;
-        if (!song.recordable){
-            option.style.color = "darkgrey"
-        }
-        song_name_choose.add(option)
-    })
 }
  
 const change_track_names = () => {

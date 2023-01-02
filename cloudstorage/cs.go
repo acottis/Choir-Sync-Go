@@ -59,7 +59,7 @@ func CreateBucket(bucketName string, projectName string) error {
 }
 
 // Parse and return the songs from the bucket
-func GetSongsInBucket(bucketName string) ([]song, error) {
+func GetSongsInBucket(bucketName string, groupName string) ([]song, error) {
 	ctx := context.Background()
 
 	client, err := storage.NewClient(ctx)
@@ -99,19 +99,21 @@ func GetSongsInBucket(bucketName string) ([]song, error) {
 			songName := tmp[0]
 			part := strings.Split(tmp[1], ".")[0]
 			recordable := (objectAttrs.Metadata["recordable"] == "true")
-			secret := (objectAttrs.Metadata["secret"] == "true")
+			group := (objectAttrs.Metadata["group"])
 			url := fmt.Sprintf(
 				"https://storage.googleapis.com/%s/%s",
 				bucketName,
 				objectAttrs.Name,
 			)
-			songs = append(songs, song{
-				Song:       songName,
-				Part:       part,
-				Recordable: recordable,
-				Secret:     secret,
-				Url:        url,
-			})
+			//to implement: groups rather than boolean secret
+			if group == groupName {
+				songs = append(songs, song{
+					Song:       songName,
+					Part:       part,
+					Recordable: recordable,
+					Url:        url,
+				})
+			}
 		}
 	}
 	return songs, nil
@@ -154,6 +156,8 @@ func UploadFileToGoogle(
 	bucketName string,
 	srcFileName string,
 	destFileName string,
+	recordable bool,
+	groupName string,
 ) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -176,6 +180,11 @@ func UploadFileToGoogle(
 
 	// Upload an object with storage.Writer.
 	writer := o.NewWriter(ctx)
+	writer.ContentType = "audio/mpeg"
+	writer.Metadata = map[string]string{
+		"recordable": fmt.Sprintf("%v", recordable),
+		"group":      fmt.Sprintf("%v", groupName),
+	}
 	if _, err = io.Copy(writer, f); err != nil {
 		return fmt.Errorf("io.Copy: %v", err)
 	}
@@ -183,5 +192,59 @@ func UploadFileToGoogle(
 		return fmt.Errorf("Writer.Close: %v", err)
 	}
 	log.Printf("Blob %v uploaded.\n", destFileName)
+	return nil
+}
+
+// Delete a file from a bucket
+func DeleteFileFromGoogle(
+	bucketName string,
+	delFileName string,
+) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	o := client.Bucket(bucketName).Object(delFileName)
+
+	if err := o.Delete(ctx); err != nil {
+		return fmt.Errorf("Object(%q).Delete: %v", delFileName, err)
+	}
+
+	log.Printf("File %v deleted.\n", delFileName)
+	return nil
+}
+
+// Delete a file from a bucket
+func RenameFileInGoogle(
+	bucketName string,
+	origFileName string,
+	newFileName string,
+) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	src := client.Bucket(bucketName).Object(origFileName)
+	dst := client.Bucket(bucketName).Object(newFileName)
+
+	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
+		return fmt.Errorf("Object(%q).CopierFrom(%q).Run: %v", newFileName, origFileName, err)
+	}
+	if err := src.Delete(ctx); err != nil {
+		return fmt.Errorf("Object(%q).Delete: %v", origFileName, err)
+	}
+	log.Printf("File %v renamed to %v.\n", origFileName, newFileName)
 	return nil
 }
