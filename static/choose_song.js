@@ -22,7 +22,6 @@ let all_song_list = []
 let recordable = true
 let on_rec_tab
 let is_safari
-let secret
 
 let audioCtx
 let panNode1
@@ -55,6 +54,44 @@ export const set_up_songs = async () => {
     }
     else{
         mimetype_chosen = ""
+    }
+}
+
+const get_songs = () => {
+    return new Promise (resolve =>{
+        const password_send = {password: password_entered}
+        fetch(`/api/v1/getsongs`, {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(password_send)
+        })
+        .then( res => {
+            if (res.status == 200){
+                res.json().then( res => {
+                    all_song_list = res
+                    resolve(true)
+                })
+            }else{
+                alert(
+                    "Server could not fetch songs, please contact administrator"
+                )
+                resolve(false)
+            }
+        })
+    })
+}
+
+song_name_choose.onchange = function (){
+    song_name = song_name_choose.value
+    song_is_chosen = false
+    backing_player.removeAttribute("src")
+    dual_player1.removeAttribute("src")
+    dual_player2.removeAttribute("src")
+    change_track_names()
+    if (on_rec_tab){
+        rec_tab_show_divs()
     }
 }
 
@@ -96,82 +133,44 @@ const change_track_names_X = (singing_part_chooseX) => {
             option.text = track.part;
             singing_part_chooseX.add(option)
             recordable = track.recordable
-            secret = track.secret
         }
     })
 }
 
-const get_songs = () => {
-    return new Promise (resolve =>{
-        const password_send = {password: password_entered}
-        fetch(`/api/v1/getsongs`, {
-            method: "post",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(password_send)
-        })
-        .then( res => {
-            if (res.status == 200){
-                res.json().then( res => {
-                    all_song_list = res
-                    resolve(true)
-                })
-            }else{
-                alert(
-                    "Server could not fetch songs, please contact administrator"
-                )
-                resolve(false)
-            }
-        })
-    })
+singing_part_choose.onchange = function (){
+    change_track("main", singing_part_choose.value)
+}
+singing_part_chooseL.onchange = function (){
+    change_track("L", singing_part_chooseL.value)
+}
+singing_part_chooseR.onchange = function (){
+    change_track("R", singing_part_chooseR.value)
 }
 
-song_name_choose.onchange = function (){
-    song_name = song_name_choose.value
-    song_is_chosen = false
-    backing_player.removeAttribute("src")
-    dual_player1.removeAttribute("src")
-    dual_player2.removeAttribute("src")
-    change_track_names()
-    if(!recordable){
-        if(on_rec_tab){
-            yes_record_divs.forEach(div => {
-                div.style.display = "none"
-            });
-        }
-        no_record_divs.forEach(div => {
-            div.style.display = "inline"
-        });
-    }
-    else{
-        if(on_rec_tab){
-            yes_record_divs.forEach(div => {
-                div.style.display = "block"
-            });
-        }
-        no_record_divs.forEach(div => {
-            div.style.display = "none"
-        });
-    }
-}
-
-const change_track = (player) => {
+const change_track = (player, song_part_chosen) => {
 
     // Get the currently selected song
     const song = all_song_list.find(song => {
         // Return the first match of the song name and part matching
-        return song.part === singing_part_choose.value &&
+        return song.part === song_part_chosen &&
             song.song === song_name_choose.value
     })
-    /// TODO - Handle undefined if song not found!
 
     switch(player){
         case "main":
-            backing_player.setAttribute("src", song.url)
+            if(song === undefined){
+                backing_player.setAttribute("src", "")
+                song_is_chosen = false
+            }
+            else{
+                backing_player.setAttribute("src", song.url)
+                song_is_chosen = true
+                singing_part = song.part
+                backing_track_file = song.url
+            }
             break;
         case "L":
-            if(song.url == ""){
+            if(song === undefined){
                 dual_player1.setAttribute("src", dual_player2.src)
                 dual_player2.muted=true
                 switch_channels=true
@@ -183,34 +182,19 @@ const change_track = (player) => {
             dual_player2.pause()
             break;
         case "R":
-            dual_player2.setAttribute("src", song.url)
+            if(song === undefined){
+                dual_player2.setAttribute("src", "")
+            }
+            else{
+                dual_player2.setAttribute("src", song.url)
+                if(dual_player1.src == "" || switch_channels){
+                    change_track("L", "blank")
+                }
+            }
             dual_player1.pause()
             dual_player1.currentTime=0
-            if(dual_player1.src==""){
-                change_track("blank", "L")
-            }
     }
 }
-
-singing_part_choose.onchange = function (){
-    change_track("main")
-}
-singing_part_chooseL.onchange = function (){
-    change_track("L")
-}
-singing_part_chooseR.onchange = function (){
-    change_track("R")
-}
-
-backing_player.addEventListener("play", event => {
-    backing_audio_playing = true
-});
-backing_player.addEventListener("pause", event => {
-    backing_audio_playing = false
-});
-backing_player.addEventListener("ended", event => {
-    backing_audio_playing = false
-});
 
 dual_player1.addEventListener("play", event => {
 
@@ -245,14 +229,9 @@ dual_player1.addEventListener("play", event => {
         dual_player2.muted = dual_player1.muted
     }
     dual_player2.play()
-    backing_audio_playing = true
 });
 dual_player1.addEventListener("pause", event => {
     dual_player2.pause()
-    backing_audio_playing = false
-});
-dual_player1.addEventListener("ended", event => {
-    backing_audio_playing = false
 });
 
 document.addEventListener('play', function(e){
@@ -317,8 +296,23 @@ want_rec.onclick = function(){
         div.style.display = "block"
     });
     on_rec_tab = true
+    rec_tab_show_divs()
+}
+
+const rec_tab_show_divs = () => {
     if(!recordable){
         yes_record_divs.forEach(div => {
+            div.style.display = "none"
+        });
+        no_record_divs.forEach(div => {
+            div.style.display = "inline"
+        });
+    }
+    else{
+        yes_record_divs.forEach(div => {
+            div.style.display = "block"
+        });
+        no_record_divs.forEach(div => {
             div.style.display = "none"
         });
     }

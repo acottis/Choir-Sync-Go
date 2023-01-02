@@ -15,6 +15,7 @@ import (
 )
 
 const PROJECTNUMBER string = "845779598570"
+const PROJECTNAME string = "choir-sync-go"
 
 // Store our password in memory that we fetch from google secret manager
 // storing as global so we can access from our handlers
@@ -42,7 +43,7 @@ func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
-		log.Printf("Defaulting to port %s", port)
+		log.Printf("Defaulting to port %s, http://localhost:8080", port)
 	}
 
 	// Serve our static files to the root directory
@@ -104,7 +105,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
 	log.Printf("%#v", req.Body)
 
-	var bucketName = os.Getenv("GOOGLE_CLOUD_PROJECT") + ".appspot.com"
+	var bucketName = PROJECTNAME + ".appspot.com"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, "tmp/test", "HelloWorld"); err != nil {
 		log.Print(err)
 	}
@@ -121,7 +122,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 // Get files from google storage
 func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 	// The bucket we are using for storage for this app
-	var bucketName = os.Getenv("GOOGLE_CLOUD_PROJECT") + ".appspot.com"
+	var bucketName = PROJECTNAME + ".appspot.com"
 	var res response
 
 	// Check user is authenticated
