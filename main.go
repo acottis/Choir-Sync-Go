@@ -166,6 +166,36 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	}
 }
 
+// Http Handler for deleting a file
+func deleteFileHandler(resW http.ResponseWriter, req *http.Request) {
+	bucketName := PROJECTNAME + ".appspot.com"
+
+	//get it to authenticate as admin too
+
+	err := req.ParseMultipartForm(32 << 20)
+	if err != nil {
+		log.Print(err)
+		log.Print("upload_error: failed to parse upload request")
+	}
+	song_name := req.PostFormValue("song_name")
+	track_name := req.PostFormValue("track_name")
+
+	del_file_name := song_name + "_" + track_name + ".mp3"
+
+	if err := cloudstorage.DeleteFileFromGoogle(bucketName, del_file_name); err != nil {
+		log.Print(err)
+	}
+
+	res := response{Message: "Delete Endpoint"}
+	bytes, err := json.Marshal(res)
+	if err != nil {
+		log.Print(err)
+	} else {
+		resW.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(resW, string(bytes))
+	}
+}
+
 // Get files from google storage
 func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 	// The bucket we are using for storage for this app

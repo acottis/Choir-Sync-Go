@@ -197,3 +197,28 @@ func UploadFileToGoogle(
 	log.Printf("Blob %v uploaded.\n", destFileName)
 	return nil
 }
+
+// Delete a file from a bucket
+func DeleteFileFromGoogle(
+	bucketName string,
+	delFileName string,
+) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	o := client.Bucket(bucketName).Object(delFileName)
+
+	if err := o.Delete(ctx); err != nil {
+		return fmt.Errorf("Object(%q).Delete: %v", delFileName, err)
+	}
+
+	log.Printf("File %v deleted.\n", delFileName)
+	return nil
+}
