@@ -124,9 +124,9 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	var song_name = req.PostFormValue("song_name")
-	var track_name = req.PostFormValue("track_name")
-	var recordable = (req.PostFormValue("recordable") == "true")
+	var song_name = req.PostForm.Get("song_name")
+	var track_name = req.PostForm.Get("track_name")
+	var recordable = (req.PostForm.Get("recordable") == "true")
 
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 
