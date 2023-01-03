@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -122,18 +124,28 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	new_file, _, err := req.FormFile("new_file")
-	if err != nil {
-		log.Print(err)
-		log.Print("upload_error: failed to parse upload request")
-	}
 	var song_name = req.PostFormValue("song_name")
 	var track_name = req.PostFormValue("track_name")
 	var recordable = (req.PostFormValue("recordable") == "true")
 
 	var new_file_name = song_name + "_" + track_name + ".mp3"
-	log.Print(new_file)
-	var temp_file_name = "tmp/testfile.mp3"
+
+	new_file, _, err := req.FormFile("new_file")
+	if err != nil {
+		log.Print(err)
+		log.Print("upload_error: failed to parse upload request")
+	}
+
+	temp_file_name := "tmp/tempfile.mp3"
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, new_file); err != nil {
+		log.Print(err)
+	}
+	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
+	if err != nil {
+		log.Print(err)
+		log.Print("upload_error: failed to save file")
+	}
 
 	var bucketName = PROJECTNAME + ".appspot.com"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
