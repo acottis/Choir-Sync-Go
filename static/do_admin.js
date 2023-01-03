@@ -110,13 +110,15 @@ const upload_new_song = function (recordable){
         console.log(recordable)
 
         ///////////////////new code to do request
-        const req_send = {password: password_entered, new_file: new_file, song_name: new_song_name, track_name: new_track_name, recordable: recordable}
+        const fd = new FormData();
+        fd.append('password', password_entered)
+        fd.append('new_file', new_file.blob)
+        fd.append('song_name', new_song_name)
+        fd.append('track_name', new_track_name)
+        fd.append('recordable', recordable)
         const res = fetch('/api/v1/uploadfile', {
             method: "post",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(req_send)
+            body: fd
         });
         console.log(res);
         ///////////////////new code to do request

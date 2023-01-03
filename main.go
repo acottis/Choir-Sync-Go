@@ -123,22 +123,19 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
 	log.Printf("%#v", req.Body)
-
-	decoder := json.NewDecoder(req.Body)
-	var upload_info upload
-	err := decoder.Decode(&upload_info)
+	err := req.ParseForm()
 	if err != nil {
-		// If the JSON does not meet our schema
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	var new_file = upload_info.New_file
-	var song_name = upload_info.Song_name
-	var track_name = upload_info.Track_name
-	var recordable = upload_info.Recordable
+	var new_file = req.Form.Get("new_file")
+	var song_name = req.Form.Get("song_name")
+	var track_name = req.Form.Get("track_name")
+	var recordable = (req.Form.Get("recordable") == "true")
 
 	var new_file_name = song_name + "_" + track_name + ".mp3"
-	new_file = "uploadtemp/testfile.mp3"
+	log.Print(new_file)
+	new_file = "tmp/testfile.mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, new_file, new_file_name, recordable, false); err != nil {
