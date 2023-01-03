@@ -124,11 +124,11 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	var song_name = req.PostForm.Get("song_name")
-	var track_name = req.PostForm.Get("track_name")
-	var recordable = (req.PostForm.Get("recordable") == "true")
+	song_name := req.FormValue("song_name")
+	track_name := req.FormValue("track_name")
+	recordable := (req.FormValue("recordable") == "true")
 
-	var new_file_name = song_name + "_" + track_name + ".mp3"
+	new_file_name := song_name + "_" + track_name + ".mp3"
 
 	new_file, _, err := req.FormFile("new_file")
 	if err != nil {
@@ -159,6 +159,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		resW.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(resW, string(bytes))
 	}
+	os.Remove(temp_file_name)
 }
 
 // Get files from google storage
