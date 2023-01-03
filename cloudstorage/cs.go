@@ -183,6 +183,7 @@ func UploadFileToGoogle(
 
 	// Upload an object with storage.Writer.
 	writer := o.NewWriter(ctx)
+	writer.ContentType = "audio/mpeg"
 	writer.Metadata = map[string]string{
 		"recordable": fmt.Sprintf("%v", recordable),
 		"secret":     fmt.Sprintf("%v", secret),
