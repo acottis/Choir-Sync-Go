@@ -223,11 +223,12 @@ delete_t.onclick= function (){
     }
     if (confirm(`Are you sure you want to delete the ${track_to_change} part for ${song_to_change}?`)){
         console.log(track)
-        //DO: delete this track
-        alert(`Success: ${song_to_change} part ${track_to_change} deleted.`)
-        update_song_names().then ( () => {
-            song_name_choose_t.value = song_to_change
-            song_name_choose_t.onchange()
+        do_delete(song_to_change,track_to_change).then ( () => {
+            alert(`Success: ${song_to_change} part ${track_to_change} deleted.`)
+            update_song_names().then ( () => {
+                song_name_choose_t.value = song_to_change
+                song_name_choose_t.onchange()
+            })
         })
     }
 }
@@ -284,6 +285,26 @@ const do_upload = (file, song, track, recordable) => {
         fd.append('track_name', track)
         fd.append('recordable', recordable)
         fetch('/api/v1/uploadfile', {
+            method: "post",
+            body: fd
+        })
+        .then( res => {
+            if (res.status == 200){
+                resolve(true)
+            }else{
+                alert("Something went wrong")
+                resolve(false)
+            }
+        })
+    })
+}
+
+const do_delete = (song, track) => {
+    return new Promise (resolve =>{
+        const fd = new FormData();
+        fd.append('song_name', song)
+        fd.append('track_name', track)
+        fetch('/api/v1/deletefile', {
             method: "post",
             body: fd
         })

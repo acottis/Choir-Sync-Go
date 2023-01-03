@@ -65,6 +65,7 @@ func main() {
 	http.HandleFunc("/api/v1/test", testHandler)
 	http.HandleFunc("/api/v1/auth", authHandler)
 	http.HandleFunc("/api/v1/uploadfile", uploadFileHandler)
+	http.HandleFunc("/api/v1/deletefile", deleteFileHandler)
 	http.HandleFunc("/api/v1/getsongs", getSongsHandler)
 
 	// Start listening on port specified
