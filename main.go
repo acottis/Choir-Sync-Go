@@ -33,14 +33,6 @@ type password struct {
 	Password string `json:"password"`
 }
 
-type upload struct {
-	Password   string `json:"password"`
-	New_file   string `json:"new_file"`
-	Song_name  string `json:"song_name"`
-	Track_name string `json:"track_name"`
-	Recordable bool   `json:"recordable"`
-}
-
 func init() {
 	var err error
 	standardPassword, err = getSecretPayload("standard-password", "1")
@@ -122,16 +114,18 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 // Http Handler for uploading a file
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
+	//get it to authenticate as admin too
+
 	log.Printf("%#v", req.Body)
 	err := req.ParseForm()
 	if err != nil {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	var new_file = req.Form.Get("new_file")
-	var song_name = req.Form.Get("song_name")
-	var track_name = req.Form.Get("track_name")
-	var recordable = (req.Form.Get("recordable") == "true")
+	var new_file = req.PostForm.Get("new_file")
+	var song_name = req.PostForm.Get("song_name")
+	var track_name = req.PostForm.Get("track_name")
+	var recordable = (req.PostForm.Get("recordable") == "true")
 
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 	log.Print(new_file)
