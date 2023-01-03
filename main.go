@@ -122,17 +122,21 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
-	var new_file = req.PostForm.Get("new_file")
-	var song_name = req.PostForm.Get("song_name")
-	var track_name = req.PostForm.Get("track_name")
-	var recordable = (req.PostForm.Get("recordable") == "true")
+	new_file, _, err := req.FormFile("new_file")
+	if err != nil {
+		log.Print(err)
+		log.Print("upload_error: failed to parse upload request")
+	}
+	var song_name = req.PostFormValue("song_name")
+	var track_name = req.PostFormValue("track_name")
+	var recordable = (req.PostFormValue("recordable") == "true")
 
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 	log.Print(new_file)
-	new_file = "tmp/testfile.mp3"
+	var temp_file_name = "tmp/testfile.mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
-	if err := cloudstorage.UploadFileToGoogle(bucketName, new_file, new_file_name, recordable, false); err != nil {
+	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
 		log.Print(err)
 	}
 	res := response{Message: "Upload Endpoint"}

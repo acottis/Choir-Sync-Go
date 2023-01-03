@@ -112,7 +112,7 @@ const upload_new_song = function (recordable){
         ///////////////////new code to do request
         const fd = new FormData();
         fd.append('password', password_entered)
-        fd.append('new_file', new_file.blob, "new_track.mp3")
+        fd.append('new_file', new_file, "new_track.mp3")
         fd.append('song_name', new_song_name)
         fd.append('track_name', new_track_name)
         fd.append('recordable', recordable)
