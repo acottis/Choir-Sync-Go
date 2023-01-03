@@ -159,6 +159,8 @@ func UploadFileToGoogle(
 	bucketName string,
 	srcFileName string,
 	destFileName string,
+	recordable bool,
+	secret bool,
 ) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -181,7 +183,10 @@ func UploadFileToGoogle(
 
 	// Upload an object with storage.Writer.
 	writer := o.NewWriter(ctx)
-	writer.ContentType = "audio/mpeg"
+	writer.Metadata = map[string]string{
+		"recordable": fmt.Sprintf("%v", recordable),
+		"secret":     fmt.Sprintf("%v", secret),
+	}
 	if _, err = io.Copy(writer, f); err != nil {
 		return fmt.Errorf("io.Copy: %v", err)
 	}
