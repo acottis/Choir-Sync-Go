@@ -33,6 +33,12 @@ type password struct {
 	Password string `json:"password"`
 }
 
+type upload struct {
+	New_file   string `json:"new_file"`
+	Song_name  string `json:"song_name"`
+	Track_name string `json:"track_name"`
+}
+
 func init() {
 	var err error
 	standardPassword, err = getSecretPayload("standard-password", "1")
@@ -117,17 +123,22 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	log.Printf("%#v", req.Body)
 
 	decoder := json.NewDecoder(req.Body)
-	var new_file string
-	var song_name string
-	var track_name string
-	decoder.Decode(&new_file)
-	decoder.Decode(&song_name)
-	decoder.Decode(&track_name)
+	var upload_info upload
+	err := decoder.Decode(&upload_info)
+	if err != nil {
+		// If the JSON does not meet our schema
+		log.Print(err)
+		log.Print("upload_error: failed to parse upload request")
+	}
+	var new_file = upload_info.New_file
+	var song_name = upload_info.Song_name
+	var track_name = upload_info.Track_name
 	var new_file_name = song_name + "_" + track_name + ".mp3"
+	new_file = "testfile.mp3"
 	new_file_name = "Test song_Test part.mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
-	if err := cloudstorage.UploadFileToGoogle(bucketName, "testfile.mp3", new_file_name); err != nil {
+	if err := cloudstorage.UploadFileToGoogle(bucketName, new_file, new_file_name); err != nil {
 		log.Print(err)
 	}
 	res := response{Message: "Upload Endpoint"}
@@ -179,7 +190,7 @@ func authenticate(req *http.Request) error {
 	var password password
 	err := decoder.Decode(&password)
 	if err != nil {
-		// If the JSON does not meed out schema
+		// If the JSON does not meet out schema
 		return fmt.Errorf("auth_error: failed to parse authentication request")
 	}
 
