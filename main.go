@@ -114,10 +114,21 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 // Http Handler for uploading a file
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
+	log.Print("hello")
 	log.Printf("%#v", req.Body)
+	log.Print("hello2")
+
+	decoder := json.NewDecoder(req.Body)
+	var new_file string
+	var song_name string
+	var track_name string
+	err1 := decoder.Decode(&new_file)
+	err2 := decoder.Decode(&song_name)
+	err3 := decoder.Decode(&track_name)
+	var new_file_name = song_name + "_" + track_name + ".mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
-	if err := cloudstorage.UploadFileToGoogle(bucketName, "tmp/test", "HelloWorld"); err != nil {
+	if err := cloudstorage.UploadFileToGoogle(bucketName, "testfile.mp3", new_file_name); err != nil {
 		log.Print(err)
 	}
 	res := response{Message: "Upload Endpoint"}

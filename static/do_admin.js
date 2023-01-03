@@ -1,4 +1,4 @@
-import {all_song_list, update_song_names} from "/log_in.js"
+import {all_song_list, update_song_names, password_entered} from "/log_in.js"
 
 const uploadsongbutton = document.getElementById("uploadsongbutton")
 const uploadtrackbutton = document.getElementById("uploadtrackbutton")
@@ -108,7 +108,7 @@ const upload_new_song = function (recordable){
         console.log(new_track_name)
         console.log(new_file)
         console.log(recordable)
-        alert("New song created. Please upload extra tracks using the 'Upload a new track for an existing song' button.")
+        alert(`Success: New song ${new_song_name} created using file ${new_file.name} for the ${new_track_name} part. Please upload extra tracks using the 'Upload a new track for an existing song' button.`)
         update_song_names()
     }
     alert(`Please choose the first mp3 file for ${new_song_name}. You will be able to upload further tracks once the song is created.`)
@@ -144,6 +144,20 @@ new_t.onclick = function (){
         //DO: add new track
         console.log(new_track_name)
         console.log(new_file)
+
+        ///////////////////new code to do request
+        const req_send = {password: password_entered, new_file: new_file, song_name: song_to_change, track_name: new_track_name}
+        const res = fetch('/api/v1/uploadfile', {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req_send)
+        });
+        console.log(res);
+        ///////////////////new code to do request
+
+        alert(`Success: New ${new_track_name} part created for ${song_to_change} using file ${new_file.name}`)
         update_song_names()
     }
     alert(`Please choose an mp3 file for ${song_to_change}`)
@@ -170,6 +184,7 @@ rename_s.onclick= function (){
     console.log(song_tracks)
     console.log(new_name)
     //DO: change the song name for all these tracks
+    alert(`Success: ${song_to_change} renamed to ${new_name}.`)
     update_song_names()
 }
 delete_s.onclick= function (){
@@ -182,6 +197,7 @@ delete_s.onclick= function (){
     if (confirm(`This will delete ${song_to_change} and all its tracks. Are you sure?`)){
         console.log(song_tracks)
         //DO: delete all these tracks
+        alert(`Success: ${song_to_change} deleted.`)
         update_song_names()
     }
 }
@@ -207,6 +223,7 @@ rename_t.onclick= function (){
     console.log(track)
     console.log(new_name)
     //DO: change this track part name
+    alert(`Success: ${song_to_change} part ${track_to_change} renamed to ${new_name}.`)
     update_song_names().then ( () => {
         song_name_choose_t.value = song_to_change
         song_name_choose_t.onchange()
@@ -223,6 +240,7 @@ delete_t.onclick= function (){
     if (confirm(`Are you sure you want to delete the ${track_to_change} part for ${song_to_change}?`)){
         console.log(track)
         //DO: delete this track
+        alert(`Success: ${song_to_change} part ${track_to_change} deleted.`)
         update_song_names().then ( () => {
             song_name_choose_t.value = song_to_change
             song_name_choose_t.onchange()
@@ -250,6 +268,7 @@ change_t.onclick= function (){
         console.log(track)
         console.log(new_file)
         //DO: change the file for this track (or delete and add)
+        alert(`Success: ${track_to_change} part for ${song_to_change} updated to use new file ${new_file.name}`)
     }
     alert(`Please choose an mp3 file to replace the ${track_to_change} part for ${song_to_change}`)
     new_track_input.click()
