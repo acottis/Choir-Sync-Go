@@ -34,9 +34,11 @@ type password struct {
 }
 
 type upload struct {
+	Password   string `json:"password"`
 	New_file   string `json:"new_file"`
 	Song_name  string `json:"song_name"`
 	Track_name string `json:"track_name"`
+	Recordable string `json:"recordable"`
 }
 
 func init() {
@@ -135,7 +137,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	var track_name = upload_info.Track_name
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 	new_file = "testfile.mp3"
-	new_file_name = "Test song_Test part.mp3"
+	//new_file_name = "Test song_Test part.mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, new_file, new_file_name); err != nil {

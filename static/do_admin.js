@@ -108,6 +108,19 @@ const upload_new_song = function (recordable){
         console.log(new_track_name)
         console.log(new_file)
         console.log(recordable)
+
+        ///////////////////new code to do request
+        const req_send = {password: password_entered, new_file: new_file, song_name: new_song_name, track_name: new_track_name, recordable: recordable}
+        const res = fetch('/api/v1/uploadfile', {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(req_send)
+        });
+        console.log(res);
+        ///////////////////new code to do request
+
         alert(`Success: New song ${new_song_name} created using file ${new_file.name} for the ${new_track_name} part. Please upload extra tracks using the 'Upload a new track for an existing song' button.`)
         update_song_names()
     }
@@ -144,18 +157,6 @@ new_t.onclick = function (){
         //DO: add new track
         console.log(new_track_name)
         console.log(new_file)
-
-        ///////////////////new code to do request
-        const req_send = {password: password_entered, new_file: new_file, song_name: song_to_change, track_name: new_track_name}
-        const res = fetch('/api/v1/uploadfile', {
-            method: "post",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(req_send)
-        });
-        console.log(res);
-        ///////////////////new code to do request
 
         alert(`Success: New ${new_track_name} part created for ${song_to_change} using file ${new_file.name}`)
         update_song_names()
