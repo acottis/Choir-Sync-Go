@@ -103,28 +103,10 @@ const upload_new_song = function (recordable){
             alert("All song and part names must be at least 3 characters in length. No change made.")
             return
         }
-        //DO: add new track
-        console.log(new_song_name)
-        console.log(new_track_name)
-        console.log(new_file)
-        console.log(recordable)
-
-        ///////////////////new code to do request
-        const fd = new FormData();
-        fd.append('password', password_entered)
-        fd.append('new_file', new_file, "new_track.mp3")
-        fd.append('song_name', new_song_name)
-        fd.append('track_name', new_track_name)
-        fd.append('recordable', recordable)
-        const res = fetch('/api/v1/uploadfile', {
-            method: "post",
-            body: fd
-        });
-        console.log(res);
-        ///////////////////new code to do request
-
-        alert(`Success: New song ${new_song_name} created using file ${new_file.name} for the ${new_track_name} part. Please upload extra tracks using the 'Upload a new track for an existing song' button.`)
-        update_song_names()
+        do_upload(new_file,new_song_name,new_track_name,recordable).then ( () => {
+            alert(`Success: New song ${new_song_name} created using file ${new_file.name} for the ${new_track_name} part. Please upload extra tracks using the 'Upload a new track for an existing song' button.`)
+            update_song_names()
+        })
     }
     alert(`Please choose the first mp3 file for ${new_song_name}. You will be able to upload further tracks once the song is created.`)
     new_track_input.click()
@@ -156,12 +138,11 @@ new_t.onclick = function (){
             alert(`There is already a ${song_to_change} part with that name, no change made.`)
             return           
         }
-        //DO: add new track
-        console.log(new_track_name)
-        console.log(new_file)
-
-        alert(`Success: New ${new_track_name} part created for ${song_to_change} using file ${new_file.name}`)
-        update_song_names()
+        const recordable = song_tracks[0].recordable
+        do_upload(new_file,song_to_change,new_track_name,recordable).then ( () => {
+            alert(`Success: New ${new_track_name} part created for ${song_to_change} using file ${new_file.name}`)
+            update_song_names()
+        })
     }
     alert(`Please choose an mp3 file for ${song_to_change}`)
     new_track_input.click()
@@ -292,4 +273,27 @@ const get_songs_info = (song_chosen) => {
         }
     })
     return track_list
+}
+
+const do_upload = (file, song, track, recordable) => {
+    return new Promise (resolve =>{
+        const fd = new FormData();
+        fd.append('password', password_entered)
+        fd.append('new_file', file, "new_track.mp3")
+        fd.append('song_name', song)
+        fd.append('track_name', track)
+        fd.append('recordable', recordable)
+        fetch('/api/v1/uploadfile', {
+            method: "post",
+            body: fd
+        })
+        .then( res => {
+            if (res.status == 200){
+                resolve(true)
+            }else{
+                alert("Something went wrong")
+                resolve(false)
+            }
+        })
+    })
 }
