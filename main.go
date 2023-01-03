@@ -122,9 +122,9 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	var new_file string
 	var song_name string
 	var track_name string
-	err1 := decoder.Decode(&new_file)
-	err2 := decoder.Decode(&song_name)
-	err3 := decoder.Decode(&track_name)
+	decoder.Decode(&new_file)
+	decoder.Decode(&song_name)
+	decoder.Decode(&track_name)
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 
 	var bucketName = PROJECTNAME + ".appspot.com"
