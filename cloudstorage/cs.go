@@ -181,6 +181,7 @@ func UploadFileToGoogle(
 
 	// Upload an object with storage.Writer.
 	writer := o.NewWriter(ctx)
+	writer.ContentType = "audio/mpeg"
 	if _, err = io.Copy(writer, f); err != nil {
 		return fmt.Errorf("io.Copy: %v", err)
 	}
