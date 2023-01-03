@@ -115,10 +115,11 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 
 // Http Handler for uploading a file
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
+	bucketName := PROJECTNAME + ".appspot.com"
+	temp_file_name := "tmp/tempfile.mp3"
 
 	//get it to authenticate as admin too
 
-	log.Printf("%#v", req.Body)
 	err := req.ParseForm()
 	if err != nil {
 		log.Print(err)
@@ -136,7 +137,6 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print("upload_error: failed to parse upload request")
 	}
 
-	temp_file_name := "tmp/tempfile.mp3"
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, new_file); err != nil {
 		log.Print(err)
@@ -147,10 +147,10 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print("upload_error: failed to save file")
 	}
 
-	var bucketName = PROJECTNAME + ".appspot.com"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
 		log.Print(err)
 	}
+
 	res := response{Message: "Upload Endpoint"}
 	bytes, err := json.Marshal(res)
 	if err != nil {
@@ -159,7 +159,11 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		resW.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(resW, string(bytes))
 	}
-	os.Remove(temp_file_name)
+
+	err = os.Remove(temp_file_name)
+	if err != nil {
+		log.Print(err)
+	}
 }
 
 // Get files from google storage
