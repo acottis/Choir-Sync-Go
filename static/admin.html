@@ -18,19 +18,60 @@
             </div>
 
             <div id="requires_password">
-                <div id="initial">
-                    <button id="uploadbutton">Upload a new track</button>
+                <div id="buttons">
+                    <button id="uploadbutton" class="big_button">Upload a new track</button>
                     <br>
-                    <button id="modifybutton">Modify/delete an existing track</button>
+                    <button id="modifysongbutton" class="big_button">Modify/delete a song</button>
+                    <br>
+                    <button id="modifytrackbutton" class="big_button">Modify/delete a single track</button>
+                    <br>
                 </div>
+
                 <div id="uploaddiv">
                     
+                    <div id="info">
+                        <p>Here are some rules and guidelines to consider if you want a song to be recordable:</p>
+                        <ul>
+                            <li>All tracks <b>must</b> be aligned, so that if you pressed play on all parts at the same time you would hear the whole song in sync. Without this, it is very difficult to merge together singers' recordings.</li>
+                            <li>There should be a metronome or backing track intro, so the singer can come in at the right time and at the right tempo.</li>
+                            <li>Similarly, it's a good idea to play the part's starting note at the beginning.</li>
+                            <li>It's also good to have a metronome or backing track through the whole song, so the singer can keep in time even if their part is silent or has long held notes.</li>
+                            <li>Try to avoid tempo changes like rubato and pauses in songs you want to record. It's very difficult to sing these with all singers in sync, when there's no conductor.</li>
+                        </ul>
+                    </div>
                 </div>
-                <div id="modifydiv">
 
+                <div id="modifysongdiv">
+                    <h1>Select a song</h1>
+                    <label for="choose_song_s">Choose a song:</label>
+                    <select id="choose_song_s" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <button id="rename_s">Rename song</button>
+                    <button id="delete_s">Delete song</button>
+                    <p class="player_text">A song can be set to 'recordable' or 'not recordable' when it is newly uploaded. If you want to change whether a song can be recorded, please delete the song and re-upload all tracks.</p>
                 </div>
+
+                <div id="modifytrackdiv">
+                    <h1>Select a track</h1>
+                    <label for="choose_song_t">Choose a song:</label>
+                    <select id="choose_song_t" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <label for="choose_track">Choose a track:</label>
+                    <select id="choose_track">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <button id="rename_t">Rename track</button>
+                    <button id="change_t">Change sound file</button>
+                    <button id="delete_t">Delete track</button>
+                </div>
+
             </div>
-            
+
         </div>
 
         <div id="switch_site">
@@ -39,4 +80,5 @@
     </body>
 
     <script type="module" src="log_in.js"></script>
+    <script type="module" src="do_admin.js"></script>
 </html>

@@ -6,6 +6,7 @@ export let password_entered
 
 const form_authenticate = document.getElementById("form_authenticate")
 const admin = (form_authenticate.className == "admin")
+const song_list_options = document.querySelectorAll('.song_list')
 
 export let all_song_list = []
 
@@ -19,9 +20,9 @@ const show_page = async () => {
         if (password_correct) {
             startdiv.style.display = "none"
             maindiv.style.display = "block"
-            if (admin){
-                get_songs()
-            }
+            get_songs().then ( () => {
+                change_song_names()
+            })
         }
     })
 }
@@ -78,6 +79,28 @@ export const get_songs = () => {
                 )
                 resolve(false)
             }
+        })
+    })
+}
+
+const change_song_names = () => {
+    let song_list = []
+    all_song_list.forEach(track => {
+        if ( !(song_list.some(song => song.name == track.song)) ) {
+            song_list.push({
+                name: track.song,
+                recordable: track.recordable,
+            })
+        }
+    })
+    song_list.forEach(song => {
+        song_list_options.forEach(selector => {
+            const option = document.createElement("option");
+            option.text = song.name;
+            if (!song.recordable){
+                option.style.color = "darkgrey"
+            }
+            selector.add(option)
         })
     })
 }

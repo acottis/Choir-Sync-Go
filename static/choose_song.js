@@ -1,4 +1,4 @@
-import {all_song_list, get_songs} from "/log_in.js"
+import {all_song_list} from "/log_in.js"
 
 const want_sim = document.getElementById("want_sim")
 const want_adv = document.getElementById("want_adv")
@@ -48,10 +48,6 @@ else{
     mimetype_chosen = ""
 }
 
-get_songs().then ( () => {
-    change_song_names()
-})
-
 song_name_choose.onchange = function (){
     song_name = song_name_choose.value
     song_is_chosen = false
@@ -62,26 +58,6 @@ song_name_choose.onchange = function (){
     if (on_rec_tab){
         rec_tab_show_divs()
     }
-}
-
-export const change_song_names = () => {
-    let song_list = []
-    all_song_list.forEach(track => {
-        if ( !(song_list.some(song => song.name == track.song)) ) {
-            song_list.push({
-                name: track.song,
-                recordable: track.recordable,
-            })
-        }
-    })
-    song_list.forEach(song => {
-        const option = document.createElement("option");
-        option.text = song.name;
-        if (!song.recordable){
-            option.style.color = "darkgrey"
-        }
-        song_name_choose.add(option)
-    })
 }
  
 const change_track_names = () => {
