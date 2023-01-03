@@ -120,7 +120,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
 	//get it to authenticate as admin too
 
-	err := req.ParseForm()
+	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
@@ -128,6 +128,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	song_name := req.PostFormValue("song_name")
 	track_name := req.PostFormValue("track_name")
 	recordable := (req.PostFormValue("recordable") == "true")
+	log.Print(req.PostFormValue("song_name"))
 
 	new_file_name := song_name + "_" + track_name + ".mp3"
 
