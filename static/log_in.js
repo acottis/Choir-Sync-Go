@@ -20,9 +20,7 @@ const show_page = async () => {
         if (password_correct) {
             startdiv.style.display = "none"
             maindiv.style.display = "block"
-            get_songs().then ( () => {
-                change_song_names()
-            })
+            update_song_names()
         }
     })
 }
@@ -57,7 +55,7 @@ form_authenticate.addEventListener("submit", event  => {
     return false
 })
 
-export const get_songs = () => {
+const get_songs = () => {
     return new Promise (resolve =>{
         const password_send = {password: password_entered}
         fetch(`/api/v1/getsongs`, {
@@ -83,24 +81,35 @@ export const get_songs = () => {
     })
 }
 
-const change_song_names = () => {
-    let song_list = []
-    all_song_list.forEach(track => {
-        if ( !(song_list.some(song => song.name == track.song)) ) {
-            song_list.push({
-                name: track.song,
-                recordable: track.recordable,
+export const update_song_names = () => {
+    return new Promise (resolve =>{
+        get_songs().then ( () => {
+            let song_list = []
+            all_song_list.forEach(track => {
+                if ( !(song_list.some(song => song.name == track.song)) ) {
+                    song_list.push({
+                        name: track.song,
+                        recordable: track.recordable,
+                    })
+                }
             })
-        }
-    })
-    song_list.forEach(song => {
-        song_list_options.forEach(selector => {
-            const option = document.createElement("option");
-            option.text = song.name;
-            if (!song.recordable){
-                option.style.color = "darkgrey"
-            }
-            selector.add(option)
+            song_list_options.forEach(selector => {
+                selector.selectedIndex = 0
+                const prev_songs = Array.from(selector.options)
+                prev_songs.shift() //exclude blank/None option
+                prev_songs.forEach( track => {
+                    selector.remove(track.index)
+                })
+                song_list.forEach(song => {
+                    const option = document.createElement("option");
+                    option.text = song.name;
+                    if (!song.recordable){
+                        option.style.color = "darkgrey"
+                    }
+                    selector.add(option)
+                })
+            })
+            resolve(true)
         })
     })
 }

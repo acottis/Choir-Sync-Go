@@ -15,7 +15,7 @@ a{
 .red{color: red;}
 .mini{font-size: 10px}
 
-#requires_password,.no_record,.sim,.adv,.rec,#uploaddiv,#modifysongdiv,#modifytrackdiv{
+#requires_password,.no_record,.sim,.adv,.rec,#uploaddiv,#modifysongdiv,#modifytrackdiv,#new_track{
     display: none;
 }
 
@@ -50,7 +50,7 @@ select{
     font-size: 20px;
 }
 
-#buttons,#choose,#practice,.yes_record,.no_record,.safari,#modifysongdiv,#modifytrackdiv{
+#buttons,#choose,#practice,.yes_record,.no_record,.safari,#modifysongdiv,#modifytrackdiv,#endinfo{
     text-align: center;
 }
 #practice{
