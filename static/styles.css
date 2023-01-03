@@ -15,7 +15,7 @@ a{
 .red{color: red;}
 .mini{font-size: 10px}
 
-#requires_password,.no_record,.sim,.adv,.rec,#uploaddiv,#modifysongdiv,#modifytrackdiv,#new_track{
+#requires_password,.no_record,.sim,.adv,.rec,#uploadsongdiv,#uploadtrackdiv,#modifysongdiv,#modifytrackdiv,#new_track,#new_track{
     display: none;
 }
 
@@ -50,7 +50,7 @@ select{
     font-size: 20px;
 }
 
-#buttons,#choose,#practice,.yes_record,.no_record,.safari,#modifysongdiv,#modifytrackdiv,#endinfo{
+#buttons,#choose,#practice,.yes_record,.no_record,.safari,#uploadsongdiv,#uploadtrackdiv,#modifysongdiv,#modifytrackdiv,#endinfo{
     text-align: center;
 }
 #practice{
@@ -66,6 +66,7 @@ select{
     padding: 20px;
     border-right: 2px solid;
     font-size: 14px;
+    text-align: left;
 }
 #recordings_area{
     padding: 20px;

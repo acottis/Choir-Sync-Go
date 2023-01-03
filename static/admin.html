@@ -19,7 +19,9 @@
 
             <div id="requires_password">
                 <div id="buttons">
-                    <button id="uploadbutton" class="big_button">Upload a new track</button>
+                    <button id="uploadsongbutton" class="big_button">Create a new song</button>
+                    <br>
+                    <button id="uploadtrackbutton" class="big_button">Upload a new track for an existing song</button>
                     <br>
                     <button id="modifysongbutton" class="big_button">Modify/delete a song</button>
                     <br>
@@ -27,10 +29,14 @@
                     <br>
                 </div>
 
-                <div id="uploaddiv">
+                <div id="uploadsongdiv">
+                    <h1>Select an option</h1>
+                    <button id="new_s_norec">Create a new song for practising only</button>
+                    <button id="new_s_rec">Create a new song for practising and recording</button>
                     
                     <div id="info">
-                        <p>Here are some rules and guidelines to consider if you want a song to be recordable:</p>
+                        <p>If you are uploading music to be used just for practising, any music file is fine.</p>
+                        <p>However, if you want to be able to record a song on this site, here are some rules and guidelines to consider:</p>
                         <ul>
                             <li>All tracks <b>must</b> be aligned, so that if you pressed play on all parts at the same time you would hear the whole song in sync. Without this, it is very difficult to merge together singers' recordings.</li>
                             <li>There should be a metronome or backing track intro, so the singer can come in at the right time and at the right tempo.</li>
@@ -39,6 +45,17 @@
                             <li>Try to avoid tempo changes like rubato and pauses in songs you want to record. It's very difficult to sing these with all singers in sync, when there's no conductor.</li>
                         </ul>
                     </div>
+                </div>
+
+                <div id="uploadtrackdiv">
+                    <h1>Select a song</h1>
+                    <label for="choose_song_u">Choose a song:</label>
+                    <select id="choose_song_u" class="song_list">
+                        <option value="blank">-----</option>
+                    </select>
+                    <br>
+                    <br>
+                    <button id="new_t">Upload a new track</button>
                 </div>
 
                 <div id="modifysongdiv">
