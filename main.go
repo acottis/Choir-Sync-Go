@@ -126,7 +126,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	var new_file_name = song_name + "_" + track_name + ".mp3"
 	new_file_name = "Test song_Test part.mp3"
 
-	var bucketName = PROJECTNAME + ".appspot.com"
+	var bucketName = PROJECTNAME + ".appspot.com/static/audio"
 	if err := cloudstorage.UploadFileToGoogle(bucketName, "testfile.mp3", new_file_name); err != nil {
 		log.Print(err)
 	}
