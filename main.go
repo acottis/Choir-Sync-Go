@@ -122,6 +122,7 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			// Password not correct
 			resW.WriteHeader(401)
+			log.Print(err)
 			res = response{Message: err.Error()}
 		} else {
 			// Good password
