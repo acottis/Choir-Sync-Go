@@ -103,6 +103,7 @@ func testHandler(resW http.ResponseWriter, req *http.Request) {
 // Handler for checking the user password
 func authHandler(resW http.ResponseWriter, req *http.Request) {
 	var res response
+	log.Print("hello1")
 
 	// Decode the body
 	decoder := json.NewDecoder(req.Body)
@@ -113,6 +114,7 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 		resW.WriteHeader(401)
 		res = response{Message: "auth_error: failed to parse authentication request"}
 	} else {
+		log.Print("hello2")
 		// Check if password is correct
 		if password.Admin == "true" {
 			err = authenticateAdmin(password.Password)
@@ -122,13 +124,13 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 		if err != nil {
 			// Password not correct
 			resW.WriteHeader(401)
-			log.Print(err)
 			res = response{Message: err.Error()}
 		} else {
 			// Good password
 			res = response{Message: "Successfully authenticated"}
 		}
 	}
+	log.Print("hello3")
 
 	// Convert our response object to JSON
 	bytes, err := json.Marshal(res)
