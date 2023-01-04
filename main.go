@@ -21,8 +21,10 @@ const PROJECTNAME string = "choir-sync-go"
 
 // Store our password in memory that we fetch from google secret manager
 // storing as global so we can access from our handlers
-var standardPassword string
+var sgcPassword string
 var secretPassword string
+var sgcPasswordAdmin string
+var secretPasswordAdmin string
 var discordEndpoint string
 var groupName string
 
@@ -38,11 +40,19 @@ type password struct {
 
 func init() {
 	var err error
-	standardPassword, err = getSecretPayload("standard-password", "1")
+	sgcPassword, err = getSecretPayload("sgc-password", "1")
 	if err != nil {
 		panic(err)
 	}
 	secretPassword, err = getSecretPayload("secret-password", "1")
+	if err != nil {
+		panic(err)
+	}
+	sgcPasswordAdmin, err = getSecretPayload("sgc-password-admin", "1")
+	if err != nil {
+		panic(err)
+	}
+	secretPasswordAdmin, err = getSecretPayload("secret-password-admin", "1")
 	if err != nil {
 		panic(err)
 	}
@@ -288,7 +298,7 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 // Check an incoming message has the correct password
 func authenticateUser(password string) error {
 
-	if password == standardPassword { // Good Passwords
+	if password == sgcPassword { // Good Passwords
 		groupName = "SGC"
 	} else if password == secretPassword {
 		groupName = "Secret"
@@ -303,9 +313,9 @@ func authenticateUser(password string) error {
 // Check an incoming message has the correct password
 func authenticateAdmin(password string) error {
 
-	if password == standardPassword { // Good Passwords
+	if password == sgcPasswordAdmin { // Good Passwords
 		groupName = "SGC"
-	} else if password == secretPassword {
+	} else if password == secretPasswordAdmin {
 		groupName = "Secret"
 	} else { // Bad password
 		log.Printf("Bad password")
