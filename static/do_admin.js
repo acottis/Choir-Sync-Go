@@ -133,6 +133,7 @@ new_t.onclick = function (){
         if (new_track_name === null){return}
         if (new_track_name.length < 3){
             alert("All song and part names must be at least 3 characters in length. No change made.")
+            return           
         }
         if (all_song_list.some(song => song.song == song_to_change && song.part == new_track_name)){
             alert(`There is already a ${song_to_change} part with that name, no change made.`)
@@ -165,11 +166,16 @@ rename_s.onclick= function (){
         alert("There is already a song with that name, no change made.")     
         return       
     }
-    console.log(song_tracks)
-    console.log(new_name)
-    //DO: change the song name for all these tracks
-    alert(`Success: ${song_to_change} renamed to ${new_name}.`)
-    update_song_names()
+    let counter = 0
+    song_tracks.forEach( track => {
+        do_rename(song_to_change,track.part,new_name,track.part).then ( () => {
+            counter++
+            if (counter == song_tracks.length){ //only show success once all requests finished
+                alert(`Success: ${song_to_change} renamed to ${new_name}.`)
+                update_song_names()
+            }
+        })
+    })
 }
 delete_s.onclick= function (){
     song_to_change = song_name_choose_s.value
@@ -210,13 +216,12 @@ rename_t.onclick= function (){
         alert(`There is already a ${song_to_change} part with that name, no change made.`)
         return           
     }
-    console.log(track)
-    console.log(new_name)
-    //DO: change this track part name
-    alert(`Success: ${song_to_change} part ${track_to_change} renamed to ${new_name}.`)
-    update_song_names().then ( () => {
-        song_name_choose_t.value = song_to_change
-        song_name_choose_t.onchange()
+    do_rename(song_to_change,track_to_change,song_to_change,new_name).then ( () => {
+        alert(`Success: ${song_to_change} part ${track_to_change} renamed to ${new_name}.`)
+        update_song_names().then ( () => {
+            song_name_choose_t.value = song_to_change
+            song_name_choose_t.onchange()
+        })
     })
 }
 delete_t.onclick= function (){
