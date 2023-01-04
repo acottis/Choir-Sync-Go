@@ -288,7 +288,7 @@ const get_songs_info = (song_chosen) => {
 }
 
 const do_upload = (file, song, track, recordable) => {
-    return new Promise (resolve =>{
+    return new Promise((resolve, reject) =>{
         const fd = new FormData();
         fd.append('password', password_entered)
         fd.append('new_file', file, "new_track.mp3")
@@ -301,16 +301,18 @@ const do_upload = (file, song, track, recordable) => {
         })
         .then( res => {
             if (res.status == 200){
-                resolve(true)
+                resolve()
             }else{
-                alert("Something went wrong")
-                resolve(false)
+                res.json().then( body => {
+                    alert("Something went wrong, no changes made. Error message: " + body.message)
+                    reject()
+                })
             }
         })
     })
 }
 const do_delete = (song, track) => {
-    return new Promise (resolve =>{
+    return new Promise((resolve, reject) =>{
         const fd = new FormData();
         fd.append('password', password_entered)
         fd.append('song_name', song)
@@ -321,16 +323,18 @@ const do_delete = (song, track) => {
         })
         .then( res => {
             if (res.status == 200){
-                resolve(true)
+                resolve()
             }else{
-                alert("Something went wrong")
-                resolve(false)
+                res.json().then( body => {
+                    alert("Something went wrong, no changes made. Error message: " + body.message)
+                    reject()
+                })
             }
         })
     })
 }
 const do_rename = (orig_song, orig_track, new_song, new_track) => {
-    return new Promise (resolve =>{
+    return new Promise((resolve, reject) =>{
         const fd = new FormData();
         fd.append('password', password_entered)
         fd.append('orig_song_name', orig_song)
@@ -343,10 +347,12 @@ const do_rename = (orig_song, orig_track, new_song, new_track) => {
         })
         .then( res => {
             if (res.status == 200){
-                resolve(true)
+                resolve()
             }else{
-                alert("Something went wrong")
-                resolve(false)
+                res.json().then( body => {
+                    alert("Something went wrong, no changes made. Error message: " + body.message)
+                    reject()
+                })
             }
         })
     })
