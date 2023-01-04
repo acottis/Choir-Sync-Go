@@ -91,10 +91,19 @@ func testHandler(resW http.ResponseWriter, req *http.Request) {
 func authHandler(resW http.ResponseWriter, req *http.Request) {
 	var res response
 
-	// Check if password is correct
-	err := authenticate(req)
+	// Decode the body
+	decoder := json.NewDecoder(req.Body)
+	var password password
+	err := decoder.Decode(&password)
 	if err != nil {
-		// If the JSON does not meed out schema, return 401
+		// If the JSON does not meet our schema
+		resW.WriteHeader(401)
+		res = response{Message: "auth_error: failed to parse authentication request"}
+	}
+
+	// Check if password is correct
+	err = authenticate(password.Password)
+	if err != nil {
 		resW.WriteHeader(401)
 		res = response{Message: err.Error()}
 	} else {
@@ -126,6 +135,9 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
+	password := req.PostFormValue("password")
+	authenticate(password)
+
 	song_name := req.PostFormValue("song_name")
 	track_name := req.PostFormValue("track_name")
 	recordable := (req.PostFormValue("recordable") == "true")
@@ -229,23 +241,14 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 }
 
 // Check an incoming message has the correct password
-func authenticate(req *http.Request) error {
+func authenticate(password string) error {
 
-	// Decode the body
-	decoder := json.NewDecoder(req.Body)
-	var password password
-	err := decoder.Decode(&password)
-	if err != nil {
-		// If the JSON does not meet out schema
-		return fmt.Errorf("auth_error: failed to parse authentication request")
-	}
-
-	if password.Password == standardPassword { // Good Passwords
+	if password == standardPassword { // Good Passwords
 		groupName = "SGC"
-	} else if password.Password == secretPassword {
+	} else if password == secretPassword {
 		groupName = "Secret"
 	} else { // Bad password
-		log.Printf("Bad password from: %s", req.RemoteAddr)
+		log.Printf("Bad password")
 		return fmt.Errorf("auth_error: bad password")
 	}
 

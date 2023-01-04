@@ -179,10 +179,16 @@ delete_s.onclick= function (){
         return
     }
     if (confirm(`This will delete ${song_to_change} and all its tracks. Are you sure?`)){
-        console.log(song_tracks)
-        //DO: delete all these tracks
-        alert(`Success: ${song_to_change} deleted.`)
-        update_song_names()
+        let counter = 0
+        song_tracks.forEach( track => {
+            do_delete(song_to_change, track.part).then ( () => {
+                counter++
+                if (counter == song_tracks.length){ //only show success once all requests finished
+                    alert(`Success: ${song_to_change} deleted.`)
+                    update_song_names()
+                }
+            })
+        })
     }
 }
 
@@ -250,10 +256,10 @@ change_t.onclick= function (){
             alert("Sorry, only .mp3 files can be uploaded. No change made.")
             return
         }
-        console.log(track)
-        console.log(new_file)
-        //DO: change the file for this track (or delete and add)
-        alert(`Success: ${track_to_change} part for ${song_to_change} updated to use new file ${new_file.name}`)
+        const recordable = track.recordable
+        do_upload(new_file,song_to_change,track_to_change,recordable).then ( () => {
+            alert(`Success: ${track_to_change} part for ${song_to_change} updated to use new file ${new_file.name}`)
+        })
     }
     alert(`Please choose an mp3 file to replace the ${track_to_change} part for ${song_to_change}`)
     new_track_input.click()
