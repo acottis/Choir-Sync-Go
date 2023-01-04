@@ -325,3 +325,25 @@ const do_delete = (song, track) => {
         })
     })
 }
+const do_rename = (orig_song, orig_track, new_song, new_track) => {
+    return new Promise (resolve =>{
+        const fd = new FormData();
+        fd.append('password', password_entered)
+        fd.append('orig_song_name', orig_song)
+        fd.append('orig_track_name', orig_track)
+        fd.append('new_song_name', new_song)
+        fd.append('new_track_name', new_track)
+        fetch('/api/v1/renamefile', {
+            method: "post",
+            body: fd
+        })
+        .then( res => {
+            if (res.status == 200){
+                resolve(true)
+            }else{
+                alert("Something went wrong")
+                resolve(false)
+            }
+        })
+    })
+}

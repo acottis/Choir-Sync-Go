@@ -20,7 +20,7 @@ const PROJECTNUMBER string = "845779598570"
 const PROJECTNAME string = "choir-sync-go"
 
 // Store our password in memory that we fetch from google secret manager
-// storing as global so we can access from our handlers
+// Storing as global so we can access from our handlers
 var sgcPassword string
 var secretPassword string
 var sgcPasswordAdmin string
@@ -28,7 +28,7 @@ var secretPasswordAdmin string
 var discordEndpoint string
 var groupName string
 
-// Our json respone schema
+// Our json response schema
 type response struct {
 	Message string `json:"message"`
 }
@@ -75,9 +75,11 @@ func main() {
 	// Our API endpoints
 	http.HandleFunc("/api/v1/test", testHandler)
 	http.HandleFunc("/api/v1/auth", authHandler)
-	http.HandleFunc("/api/v1/uploadfile", uploadFileHandler)
-	http.HandleFunc("/api/v1/deletefile", deleteFileHandler)
 	http.HandleFunc("/api/v1/getsongs", getSongsHandler)
+	// w is a silly wrapper function for my wrapper function so I can pass an extra parameter into my wrapper function
+	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "upload") })
+	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
+	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })
 
 	// Start listening on port specified
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -107,26 +109,27 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 	var password password
 	err := decoder.Decode(&password)
 	if err != nil {
-		// If the JSON does not meet our schema
+		// JSON does not meet our schema
 		resW.WriteHeader(401)
 		res = response{Message: "auth_error: failed to parse authentication request"}
+	} else {
+		// Check if password is correct
+		if password.Admin == "true" {
+			err = authenticateAdmin(password.Password)
+		} else {
+			err = authenticateUser(password.Password)
+		}
+		if err != nil {
+			// Password not correct
+			resW.WriteHeader(401)
+			res = response{Message: err.Error()}
+		} else {
+			// Good password
+			res = response{Message: "Successfully authenticated"}
+		}
 	}
 
-	// Check if password is correct
-	if password.Admin == "true" {
-		err = authenticateAdmin(password.Password)
-	} else {
-		err = authenticateUser(password.Password)
-	}
-	if err != nil {
-		resW.WriteHeader(401)
-		res = response{Message: err.Error()}
-	} else {
-		// Good password
-		res = response{Message: "Successfully authenticated"}
-	}
-
-	// Conver our response object to JSON
+	// Convert our response object to JSON
 	bytes, err := json.Marshal(res)
 	if err != nil {
 		log.Print(err)
@@ -138,27 +141,47 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 	}
 }
 
-// Http Handler for uploading a file
-func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
+// Wrapper for handlers
+func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string) {
 	var res response
+
+	switch requesttype {
+	case "upload":
+		res = uploadFileHandler(resW, req)
+	case "delete":
+		res = deleteFileHandler(resW, req)
+	case "rename":
+		res = renameFileHandler(resW, req)
+	}
+
+	bytes, err := json.Marshal(res)
+	if err != nil {
+		log.Print(err)
+	} else {
+		resW.Header().Set("Content-Type", "application/json")
+		fmt.Fprint(resW, string(bytes))
+	}
+}
+
+// Http Handler for uploading a file
+func uploadFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	bucketName := PROJECTNAME + ".appspot.com"
+
 	temp_file_name := "tmp/tempfile.mp3"
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
-		log.Print("upload_error: failed to parse upload request")
+		return response{Message: "upload_error: failed to parse upload request"}
 	}
 	password := req.PostFormValue("password")
 
 	// Check if password is correct
 	err = authenticateAdmin(password)
 	if err != nil {
+		// Password not correct
 		resW.WriteHeader(401)
-		res = response{Message: err.Error()}
-	} else {
-		// Good password
-		res = response{Message: "Successfully authenticated"}
+		return response{Message: err.Error()}
 	}
 
 	song_name := req.PostFormValue("song_name")
@@ -170,7 +193,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	new_file, _, err := req.FormFile("new_file")
 	if err != nil {
 		log.Print(err)
-		log.Print("upload_error: failed to parse upload request")
+		return response{Message: "upload_error: failed to parse uploaded file"}
 	}
 
 	buf := bytes.NewBuffer(nil)
@@ -180,48 +203,40 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
 	if err != nil {
 		log.Print(err)
-		log.Print("upload_error: failed to save file")
+		return response{"upload_error: failed to write file to bytes"}
 	}
 
 	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
 		log.Print(err)
-	}
-
-	res = response{Message: "Upload Endpoint"}
-	bytes, err := json.Marshal(res)
-	if err != nil {
-		log.Print(err)
-	} else {
-		resW.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(resW, string(bytes))
+		return response{"upload_error: failed to upload file"}
 	}
 
 	err = os.Remove(temp_file_name)
 	if err != nil {
 		log.Print(err)
+		return response{"upload_error: failed to delete temporary file"}
 	}
+
+	return response{Message: "Upload Endpoint"}
 }
 
 // Http Handler for deleting a file
-func deleteFileHandler(resW http.ResponseWriter, req *http.Request) {
-	var res response
+func deleteFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	bucketName := PROJECTNAME + ".appspot.com"
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
-		log.Print("upload_error: failed to parse upload request")
+		log.Print("delete_error: failed to parse delete request")
 	}
 	password := req.PostFormValue("password")
 
 	// Check if password is correct
 	err = authenticateAdmin(password)
 	if err != nil {
+		// Password not correct
 		resW.WriteHeader(401)
-		res = response{Message: err.Error()}
-	} else {
-		// Good password
-		res = response{Message: "Successfully authenticated"}
+		return response{Message: err.Error()}
 	}
 
 	song_name := req.PostFormValue("song_name")
@@ -231,16 +246,45 @@ func deleteFileHandler(resW http.ResponseWriter, req *http.Request) {
 
 	if err := cloudstorage.DeleteFileFromGoogle(bucketName, del_file_name); err != nil {
 		log.Print(err)
+		return response{Message: "delete_error: failed to delete file"}
 	}
 
-	res = response{Message: "Delete Endpoint"}
-	bytes, err := json.Marshal(res)
+	return response{Message: "Delete Endpoint"}
+}
+
+// Http Handler for renaming a file
+func renameFileHandler(resW http.ResponseWriter, req *http.Request) response {
+	bucketName := PROJECTNAME + ".appspot.com"
+
+	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
-	} else {
-		resW.Header().Set("Content-Type", "application/json")
-		fmt.Fprint(resW, string(bytes))
+		log.Print("delete_error: failed to parse rename request")
 	}
+	password := req.PostFormValue("password")
+
+	// Check if password is correct
+	err = authenticateAdmin(password)
+	if err != nil {
+		// Password not correct
+		resW.WriteHeader(401)
+		return response{Message: err.Error()}
+	}
+
+	orig_song_name := req.PostFormValue("orig_song_name")
+	orig_track_name := req.PostFormValue("orig_track_name")
+	new_song_name := req.PostFormValue("new_song_name")
+	new_track_name := req.PostFormValue("new_track_name")
+
+	orig_file_name := orig_song_name + "_" + orig_track_name + ".mp3"
+	new_file_name := new_song_name + "_" + new_track_name + ".mp3"
+
+	if err := cloudstorage.RenameFileInGoogle(bucketName, orig_file_name, new_file_name); err != nil {
+		log.Print(err)
+		return response{Message: "rename_error: failed to rename file"}
+	}
+
+	return response{Message: "Rename Endpoint"}
 }
 
 // Get files from google storage
