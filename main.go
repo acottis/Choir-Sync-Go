@@ -33,6 +33,7 @@ type response struct {
 
 type password struct {
 	Password string `json:"password"`
+	Admin    string `json:"admin"`
 }
 
 func init() {
@@ -102,7 +103,11 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 	}
 
 	// Check if password is correct
-	err = authenticate(password.Password)
+	if password.Admin == "true" {
+		err = authenticateAdmin(password.Password)
+	} else {
+		err = authenticateUser(password.Password)
+	}
 	if err != nil {
 		resW.WriteHeader(401)
 		res = response{Message: err.Error()}
@@ -125,10 +130,9 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 
 // Http Handler for uploading a file
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
+	var res response
 	bucketName := PROJECTNAME + ".appspot.com"
 	temp_file_name := "tmp/tempfile.mp3"
-
-	//get it to authenticate as admin too
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
@@ -136,7 +140,16 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print("upload_error: failed to parse upload request")
 	}
 	password := req.PostFormValue("password")
-	authenticate(password)
+
+	// Check if password is correct
+	err = authenticateAdmin(password)
+	if err != nil {
+		resW.WriteHeader(401)
+		res = response{Message: err.Error()}
+	} else {
+		// Good password
+		res = response{Message: "Successfully authenticated"}
+	}
 
 	song_name := req.PostFormValue("song_name")
 	track_name := req.PostFormValue("track_name")
@@ -164,7 +177,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 	}
 
-	res := response{Message: "Upload Endpoint"}
+	res = response{Message: "Upload Endpoint"}
 	bytes, err := json.Marshal(res)
 	if err != nil {
 		log.Print(err)
@@ -181,15 +194,26 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) {
 
 // Http Handler for deleting a file
 func deleteFileHandler(resW http.ResponseWriter, req *http.Request) {
+	var res response
 	bucketName := PROJECTNAME + ".appspot.com"
-
-	//get it to authenticate as admin too
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
 		log.Print("upload_error: failed to parse upload request")
 	}
+	password := req.PostFormValue("password")
+
+	// Check if password is correct
+	err = authenticateAdmin(password)
+	if err != nil {
+		resW.WriteHeader(401)
+		res = response{Message: err.Error()}
+	} else {
+		// Good password
+		res = response{Message: "Successfully authenticated"}
+	}
+
 	song_name := req.PostFormValue("song_name")
 	track_name := req.PostFormValue("track_name")
 
@@ -199,7 +223,7 @@ func deleteFileHandler(resW http.ResponseWriter, req *http.Request) {
 		log.Print(err)
 	}
 
-	res := response{Message: "Delete Endpoint"}
+	res = response{Message: "Delete Endpoint"}
 	bytes, err := json.Marshal(res)
 	if err != nil {
 		log.Print(err)
@@ -215,7 +239,28 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 	var bucketName = PROJECTNAME + ".appspot.com"
 	var res response
 
-	// Check user is authenticated
+	// Decode the body
+	decoder := json.NewDecoder(req.Body)
+	var password password
+	err := decoder.Decode(&password)
+	if err != nil {
+		// If the JSON does not meet our schema
+		resW.WriteHeader(401)
+		res = response{Message: "auth_error: failed to parse authentication request"}
+	}
+	// Check if password is correct
+	if password.Admin == "true" {
+		err = authenticateAdmin(password.Password)
+	} else {
+		err = authenticateUser(password.Password)
+	}
+	if err != nil {
+		resW.WriteHeader(401)
+		res = response{Message: err.Error()}
+	} else {
+		// Good password
+		res = response{Message: "Successfully authenticated"}
+	}
 
 	songs, err := cloudstorage.GetSongsInBucket(bucketName, groupName)
 	if err != nil {
@@ -241,7 +286,22 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 }
 
 // Check an incoming message has the correct password
-func authenticate(password string) error {
+func authenticateUser(password string) error {
+
+	if password == standardPassword { // Good Passwords
+		groupName = "SGC"
+	} else if password == secretPassword {
+		groupName = "Secret"
+	} else { // Bad password
+		log.Printf("Bad password")
+		return fmt.Errorf("auth_error: bad password")
+	}
+
+	return nil
+}
+
+// Check an incoming message has the correct password
+func authenticateAdmin(password string) error {
 
 	if password == standardPassword { // Good Passwords
 		groupName = "SGC"

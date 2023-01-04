@@ -27,7 +27,7 @@ const show_page = async () => {
 
 const authenticate = (password_passed) => {
     return new Promise (resolve =>{
-        const password_send = {password: password_passed}
+        const password_send = {password: password_passed, admin: admin}
 
         fetch(`/api/v1/auth`, {
             //also pass whether we're signing in to admin or normal
@@ -57,7 +57,7 @@ form_authenticate.addEventListener("submit", event  => {
 
 const get_songs = () => {
     return new Promise (resolve =>{
-        const password_send = {password: password_entered}
+        const password_send = {password: password_entered, admin: admin}
         fetch(`/api/v1/getsongs`, {
             method: "post",
             headers: {
