@@ -309,7 +309,6 @@ const do_upload = (file, song, track, recordable) => {
         })
     })
 }
-
 const do_delete = (song, track) => {
     return new Promise (resolve =>{
         const fd = new FormData();

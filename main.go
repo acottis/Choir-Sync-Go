@@ -78,8 +78,8 @@ func main() {
 	http.HandleFunc("/api/v1/getsongs", getSongsHandler)
 	// w is a silly wrapper function for my wrapper function so I can pass an extra parameter into my wrapper function
 	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "upload") })
-	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
-	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })
+	http.HandleFunc("/api/v1/deletefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
+	http.HandleFunc("/api/v1/renamefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })
 
 	// Start listening on port specified
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -199,11 +199,12 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, new_file); err != nil {
 		log.Print(err)
+		return response{"upload_error: failed to write file to bytes"}
 	}
 	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
 	if err != nil {
 		log.Print(err)
-		return response{"upload_error: failed to write file to bytes"}
+		return response{"upload_error: failed to write temporary file"}
 	}
 
 	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
@@ -227,7 +228,7 @@ func deleteFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
-		log.Print("delete_error: failed to parse delete request")
+		return response{"delete_error: failed to parse delete request"}
 	}
 	password := req.PostFormValue("password")
 
@@ -259,7 +260,7 @@ func renameFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
 		log.Print(err)
-		log.Print("delete_error: failed to parse rename request")
+		return response{"delete_error: failed to parse rename request"}
 	}
 	password := req.PostFormValue("password")
 
