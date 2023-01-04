@@ -222,3 +222,32 @@ func DeleteFileFromGoogle(
 	log.Printf("File %v deleted.\n", delFileName)
 	return nil
 }
+
+// Delete a file from a bucket
+func RenameFileInGoogle(
+	bucketName string,
+	origFileName string,
+	newFileName string,
+) error {
+	ctx := context.Background()
+	client, err := storage.NewClient(ctx)
+	if err != nil {
+		return fmt.Errorf("storage.NewClient: %v", err)
+	}
+	defer client.Close()
+
+	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
+	defer cancel()
+
+	src := client.Bucket(bucketName).Object(origFileName)
+	dst := client.Bucket(bucketName).Object(newFileName)
+
+	if _, err := dst.CopierFrom(src).Run(ctx); err != nil {
+		return fmt.Errorf("Object(%q).CopierFrom(%q).Run: %v", newFileName, origFileName, err)
+	}
+	if err := src.Delete(ctx); err != nil {
+		return fmt.Errorf("Object(%q).Delete: %v", origFileName, err)
+	}
+	log.Printf("File %v renamed to %v.\n", origFileName, newFileName)
+	return nil
+}

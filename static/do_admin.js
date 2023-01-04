@@ -308,6 +308,7 @@ const do_upload = (file, song, track, recordable) => {
 const do_delete = (song, track) => {
     return new Promise (resolve =>{
         const fd = new FormData();
+        fd.append('password', password_entered)
         fd.append('song_name', song)
         fd.append('track_name', track)
         fetch('/api/v1/deletefile', {
