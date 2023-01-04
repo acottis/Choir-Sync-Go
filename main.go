@@ -35,7 +35,7 @@ type response struct {
 
 type password struct {
 	Password string `json:"password"`
-	Admin    string `json:"admin"`
+	Admin    bool   `json:"admin"`
 }
 
 func init() {
@@ -115,7 +115,7 @@ func authHandler(resW http.ResponseWriter, req *http.Request) {
 		res = response{Message: "auth_error: failed to parse authentication request"}
 	} else {
 		// Check if password is correct
-		if password.Admin == "true" {
+		if password.Admin {
 			err = authenticateAdmin(password.Password)
 		} else {
 			err = authenticateUser(password.Password)
@@ -301,11 +301,12 @@ func getSongsHandler(resW http.ResponseWriter, req *http.Request) {
 	err := decoder.Decode(&password)
 	if err != nil {
 		// If the JSON does not meet our schema
+		log.Print(err)
 		resW.WriteHeader(401)
 		res = response{Message: "auth_error: failed to parse authentication request"}
 	}
 	// Check if password is correct
-	if password.Admin == "true" {
+	if password.Admin {
 		err = authenticateAdmin(password.Password)
 	} else {
 		err = authenticateUser(password.Password)
