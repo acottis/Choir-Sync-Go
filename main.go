@@ -76,7 +76,7 @@ func main() {
 	http.HandleFunc("/api/v1/test", testHandler)
 	http.HandleFunc("/api/v1/auth", authHandler)
 	http.HandleFunc("/api/v1/getsongs", getSongsHandler)
-	// w is a silly wrapper function for my wrapper function so I can pass an extra parameter into my wrapper function
+	// using a wrapper function for my wrapper function so I can pass an extra parameter into my wrapper function
 	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "upload") })
 	http.HandleFunc("/api/v1/deletefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
 	http.HandleFunc("/api/v1/renamefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })

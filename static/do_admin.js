@@ -78,31 +78,16 @@ new_s_rec.onclick = function (){
 }
 const upload_new_song = function (recordable){
     const new_song_name = prompt("Please enter the new song name:")
-    if (new_song_name === null){return}
-    if (new_song_name.length < 3){
-        alert("All song and part names must be at least 3 characters in length. No change made.")
-        return
-    }
+    if (!basic_new_name_checks(new_song_name)){return}
     if (all_song_list.some(song => song.song == new_song_name)){
         alert("There is already a song with that name, no change made.")
         return
     }
     new_track_input.onchange = e => { 
         const new_file = e.target.files[0];
-        if (new_file===undefined){
-            alert("No file chosen, no change made.")
-            return
-        }
-        if (new_file.name.split('.').pop() != "mp3"){
-            alert("Sorry, only .mp3 files can be uploaded. No change made.")
-            return
-        }
-        const new_track_name = prompt("Please enter the part name for the file chosen (e.g. Soprano, Bass, Full):") //not checking for duplicates as this is the first track
-        if (new_track_name === null){return}
-        if (new_track_name.length < 3){
-            alert("All song and part names must be at least 3 characters in length. No change made.")
-            return
-        }
+        if(!new_file_checks(new_file)){return}
+        const new_track_name = prompt("Please enter the part name for the file chosen (e.g. Soprano, Bass, Full):")
+        if (!basic_new_name_checks(new_track_name)){return} //not checking for duplicates as this is the first track
         do_upload(new_file,new_song_name,new_track_name,recordable).then ( () => {
             alert(`Success: New song ${new_song_name} created using file ${new_file.name} for the ${new_track_name} part. Please upload extra tracks using the 'Upload a new track for an existing song' button.`)
             update_song_names()
@@ -121,20 +106,9 @@ new_t.onclick = function (){
     }
     new_track_input.onchange = e => { 
         const new_file = e.target.files[0];
-        if (new_file===undefined){
-            alert("No file chosen, no change made.")
-            return
-        }
-        if (new_file.name.split('.').pop() != "mp3"){
-            alert("Sorry, only .mp3 files can be uploaded. No change made.")
-            return
-        }
+        if(!new_file_checks(new_file)){return}
         const new_track_name = prompt("Please enter the part name for the file chosen (e.g. Soprano, Bass, Full):")
-        if (new_track_name === null){return}
-        if (new_track_name.length < 3){
-            alert("All song and part names must be at least 3 characters in length. No change made.")
-            return           
-        }
+        if (!basic_new_name_checks(new_track_name)){return}
         if (all_song_list.some(song => song.song == song_to_change && song.part == new_track_name)){
             alert(`There is already a ${song_to_change} part with that name, no change made.`)
             return           
@@ -157,11 +131,7 @@ rename_s.onclick= function (){
         return
     }
     const new_name = prompt("Please enter the new song name:", song_to_change)
-    if (new_name === null){return}
-    if (new_name.length < 3){
-        alert("All song and part names must be at least 3 characters in length. No change made.")
-        return
-    }
+    if (!basic_new_name_checks(new_name)){return}
     if (all_song_list.some(song => song.song == new_name)){
         alert("There is already a song with that name, no change made.")     
         return       
@@ -207,11 +177,7 @@ rename_t.onclick= function (){
         return
     }
     const new_name = prompt("Please enter the new part name:", track_to_change)
-    if (new_name === null){return}
-    if (new_name.length < 3){
-        alert("All song and part names must be at least 3 characters in length. No change made.")
-        return
-    }
+    if (!basic_new_name_checks(new_name)){return}
     if (all_song_list.some(song => song.song == song_to_change && song.part == new_name)){
         alert(`There is already a ${song_to_change} part with that name, no change made.`)
         return           
@@ -253,14 +219,7 @@ change_t.onclick= function (){
     }
     new_track_input.onchange = e => { 
         const new_file = e.target.files[0]; 
-        if (new_file===undefined){
-            alert("No file chosen, no change made.")
-            return
-        }
-        if (new_file.name.split('.').pop() != "mp3"){
-            alert("Sorry, only .mp3 files can be uploaded. No change made.")
-            return
-        }
+        if(!new_file_checks(new_file)){return}
         const recordable = track.recordable
         do_upload(new_file,song_to_change,track_to_change,recordable).then ( () => {
             alert(`Success: ${track_to_change} part for ${song_to_change} updated to use new file ${new_file.name}`)
@@ -285,6 +244,30 @@ const get_songs_info = (song_chosen) => {
         }
     })
     return track_list
+}
+
+const new_file_checks = (file) => {
+    if (file===undefined){
+        alert("No file chosen, no change made.")
+        return false
+    }
+    if (file.name.split('.').pop() != "mp3"){
+        alert("Sorry, only .mp3 files can be uploaded. No change made.")
+        return false
+    }
+    if (file.size > 8*1024){
+        alert("Sorry, the maximum file size is 8MB (around 8 minutes of music). No change made.")
+        return false
+    }
+    return true
+}
+const basic_new_name_checks = (name) => {
+    if (name === null){return false}
+    if (name.length < 3){
+        alert("All song and part names must be at least 3 characters in length. No change made.")
+        return false
+    }
+    return true
 }
 
 const do_upload = (file, song, track, recordable) => {
