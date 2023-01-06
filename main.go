@@ -321,7 +321,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 		return response{Message: "upload_error: failed to parse uploaded file"}
 	}
 	buf := bytes.NewBuffer(nil)
-	if _, err := io.Copy(buf, new_file); err != nil {
+	if _, err := io.Copy(buf, recording); err != nil {
 		log.Print(err)
 		return response{"upload_error: failed to write file to bytes"}
 	}
