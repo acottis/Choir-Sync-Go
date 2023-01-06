@@ -327,7 +327,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 		log.Print(err)
 		return response{"upload_error: failed to write file to bytes"}
 	}
-	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
+	err = os.WriteFile(temp_file_name, buf.Bytes(), 0777)
 	if err != nil {
 		log.Print(err)
 		return response{"upload_error: failed to write temporary file"}

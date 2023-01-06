@@ -233,7 +233,7 @@ const send_recording = (recording) => {
     if (response_text != "cancelled"){
         if (confirm(response_text)){
 
-            let safari_mobile_flag
+            let safari_mobile_flag = ""
             if (navigator.userAgent.includes("Safari") && !navigator.userAgent.includes("Chrome")){
                 safari_mobile_flag = safari_mobile_flag + "_safari"
             }
@@ -249,6 +249,7 @@ const send_recording = (recording) => {
             fd.append('singer_name', singer_name)
             fd.append('message', message)
             fd.append('password', password_entered)
+            console.log(fd)
 
             fetch(`/api/v1/uploadrecording`, {
                 method: "post",
