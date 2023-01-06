@@ -315,6 +315,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 	singer := req.PostFormValue("singer_name")
 	file_name := req.PostFormValue("file_name")
 	temp_file_name := "tmp/" + file_name
+	log.Print(temp_file_name)
 
 	recording, _, err := req.FormFile("recording")
 	if err != nil {
