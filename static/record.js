@@ -244,7 +244,7 @@ const send_recording = (recording) => {
             const date_id = new Date(Date.now())
             let date_string = date_id.toISOString()
             date_string = date_string.split(".")[0]
-            date_string = date_string.replace(":","")
+            date_string = date_string.replaceAll(":","")
 
             const fd = new FormData();
             fd.append('recording', recording.blob)
