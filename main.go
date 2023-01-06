@@ -315,7 +315,6 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 	singer := req.PostFormValue("singer_name")
 	file_name := req.PostFormValue("file_name")
 	temp_file_name := "tmp/" + file_name
-	log.Print(temp_file_name)
 
 	recording, _, err := req.FormFile("recording")
 	if err != nil {
@@ -327,8 +326,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 		log.Print(err)
 		return response{"upload_error: failed to write file to bytes"}
 	}
-	//err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
-	err = os.WriteFile("tmp/tempfile.mp3", buf.Bytes(), 0644)
+	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
 	if err != nil {
 		log.Print(err)
 		return response{"upload_error: failed to write temporary file"}

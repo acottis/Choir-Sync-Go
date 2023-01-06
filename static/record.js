@@ -242,10 +242,12 @@ const send_recording = (recording) => {
             }
 
             const date_id = new Date(Date.now())
+            let date_string = date_id.toISOString()
+            date_string = date_string.split(".")[0]
 
             const fd = new FormData();
             fd.append('recording', recording.blob)
-            fd.append('file_name', `${send_song_name}_${singer_name}_${send_singing_part}_${date_id.toISOString()}${safari_mobile_flag}.mp3`)
+            fd.append('file_name', `${send_song_name}_${singer_name}_${send_singing_part}_${date_string}${safari_mobile_flag}.mp3`)
             fd.append('singer_name', singer_name)
             fd.append('message', message)
             fd.append('password', password_entered)
