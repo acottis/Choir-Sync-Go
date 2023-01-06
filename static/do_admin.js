@@ -255,7 +255,7 @@ const new_file_checks = (file) => {
         alert("Sorry, only .mp3 files can be uploaded. No change made.")
         return false
     }
-    if (file.size > 8*1024){
+    if (file.size > 8*1024*1024){
         alert("Sorry, the maximum file size is 8MB (around 8 minutes of music). No change made.")
         return false
     }
