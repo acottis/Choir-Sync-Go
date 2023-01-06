@@ -331,7 +331,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 		return response{"upload_error: failed to write temporary file"}
 	}
 
-	if err := discord.UploadFile(temp_file_name, singer, message); err != nil {
+	if err := discord.UploadFile(discordEndpoint, temp_file_name, singer, message); err != nil {
 		log.Print(err)
 		return response{Message: err.Error()}
 	}
