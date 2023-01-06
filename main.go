@@ -337,6 +337,12 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 		return response{Message: err.Error()}
 	}
 
+	err = os.Remove(temp_file_name)
+	if err != nil {
+		log.Print(err)
+		return response{"upload_error: failed to delete temporary file"}
+	}
+
 	return response{Message: "Send Recording Endpoint"}
 }
 
