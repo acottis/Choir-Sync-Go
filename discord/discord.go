@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 )
 
 // Upload a file to discord, takes a `fileName` which is the path to the file on
@@ -33,7 +34,8 @@ func UploadFile(discordEndpoint string, fileName string, singer string, message 
 	multiWriter.WriteField("content", discord_message)
 
 	//Add our file to the multipart
-	partWriter, err := multiWriter.CreateFormFile("file", fileName)
+	fileNameUse := strings.Replace(fileName, "tmp/", "", 1)
+	partWriter, err := multiWriter.CreateFormFile("file", fileNameUse)
 	if err != nil {
 		return err
 	}
