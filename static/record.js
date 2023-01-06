@@ -244,6 +244,7 @@ const send_recording = (recording) => {
             const date_id = new Date(Date.now())
             let date_string = date_id.toISOString()
             date_string = date_string.split(".")[0]
+            date_string = date_string.replace(":","")
 
             const fd = new FormData();
             fd.append('recording', recording.blob)
@@ -251,20 +252,18 @@ const send_recording = (recording) => {
             fd.append('singer_name', singer_name)
             fd.append('message', message)
             fd.append('password', password_entered)
-            console.log(fd)
 
             fetch(`/api/v1/uploadrecording`, {
                 method: "post",
                 body: fd
             })
-            .then( res => res.json() )
-            .then ( json_response => {
-                console.log(json_response.status)
-                if (json_response.status == "success"){
+            .then( res => {
+                if (res.status == 200){
                     alert(`Recording received, thank you ${singer_name}!`)
-                }
-                else{
-                    alert(`Sorry, there was an error: "${json_response.message}"`)
+                }else{
+                    res.json().then( body => {
+                        alert(`Sorry, there was an error: "${body.message}"`)
+                    })
                 }
 
             });
