@@ -11,7 +11,7 @@ import (
 
 // Upload a file to discord, takes a `fileName` which is the path to the file on
 // the disk and `message` which is sent along side the file to discord
-func UploadFile(fileName string, message string) error {
+func UploadFile(fileName string, singer string, message string) error {
 
 	// Discord Base URL Constant
 	const DISCORD_BASE_URL = "https://discord.com/api/webhooks/"
@@ -22,6 +22,13 @@ func UploadFile(fileName string, message string) error {
 		return errors.New("env: Missing env variable DISCORD_ENDPOINT")
 	}
 
+	var discord_message string
+	if message == "" {
+		discord_message = singer + "didn't add a comment"
+	} else {
+		discord_message = singer + "said: " + message
+	}
+
 	// Create an empty buffer for body
 	body := &bytes.Buffer{}
 
@@ -29,7 +36,7 @@ func UploadFile(fileName string, message string) error {
 	multiWriter := multipart.NewWriter(body)
 
 	// Add our message to the formdata
-	multiWriter.WriteField("content", message)
+	multiWriter.WriteField("content", discord_message)
 
 	//Add our file to the multipart
 	partWriter, err := multiWriter.CreateFormFile("file", fileName)

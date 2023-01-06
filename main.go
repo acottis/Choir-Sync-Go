@@ -11,6 +11,7 @@ import (
 	"os"
 
 	"choir-sync/cloudstorage"
+	"choir-sync/discord"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
@@ -80,6 +81,7 @@ func main() {
 	http.HandleFunc("/api/v1/uploadfile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "upload") })
 	http.HandleFunc("/api/v1/deletefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
 	http.HandleFunc("/api/v1/renamefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })
+	http.HandleFunc("/api/v1/uploadrecording", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "sendrec") })
 
 	// Start listening on port specified
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -153,6 +155,8 @@ func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string
 		res = deleteFileHandler(resW, req)
 	case "rename":
 		res = renameFileHandler(resW, req)
+	case "sendrec":
+		res = sendRecordingHandler(resW, req)
 	}
 
 	bytes, err := json.Marshal(res)
@@ -287,6 +291,52 @@ func renameFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	}
 
 	return response{Message: "Rename Endpoint"}
+}
+
+// Http Handler for sending a recording to discord
+func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response {
+	temp_file_name := "tmp/tempfile.mp3"
+
+	err := req.ParseMultipartForm(32 << 20)
+	if err != nil {
+		log.Print(err)
+		return response{"sendrec_error: failed to parse upload request"}
+	}
+
+	password := req.PostFormValue("password")
+	// Check if password is correct
+	err = authenticateUser(password)
+	if err != nil {
+		// Password not correct
+		resW.WriteHeader(401)
+		return response{Message: err.Error()}
+	}
+
+	message := req.PostFormValue("message")
+	singer := req.PostFormValue("singer_name")
+
+	recording, _, err := req.FormFile("recording")
+	if err != nil {
+		log.Print(err)
+		return response{Message: "upload_error: failed to parse uploaded file"}
+	}
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, new_file); err != nil {
+		log.Print(err)
+		return response{"upload_error: failed to write file to bytes"}
+	}
+	err = os.WriteFile(temp_file_name, buf.Bytes(), 0644)
+	if err != nil {
+		log.Print(err)
+		return response{"upload_error: failed to write temporary file"}
+	}
+
+	if err := discord.UploadFile(temp_file_name, singer, message); err != nil {
+		log.Print(err)
+		return response{Message: err.Error()}
+	}
+
+	return response{Message: "Send Recording Endpoint"}
 }
 
 // Get files from google storage
