@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"io"
+	"log"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -44,11 +45,14 @@ func UploadFile(discordEndpoint string, fileName string, singer string, message 
 	if err != nil {
 		return err
 	}
+	log.Print(fileName)
+	log.Print(file)
 	// Copy the contents of the file to the file section of the body buffer
 	_, err = io.Copy(partWriter, file)
 	if err != nil {
 		return err
 	}
+	log.Print(file)
 
 	// Close our file and writer to our multipart
 	file.Close()
