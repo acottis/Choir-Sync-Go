@@ -16,17 +16,11 @@ func UploadFile(discordEndpoint string, fileName string, singer string, message 
 	// Discord Base URL Constant
 	const DISCORD_BASE_URL = "https://discord.com/api/webhooks/"
 
-	// Our webhook endpoint https://discord.com/developers/docs/reference#uploading-files
-	// discordEndpoint := os.Getenv("DISCORD_ENDPOINT")
-	// if discordEndpoint == "" {
-	// 	return errors.New("env: Missing env variable DISCORD_ENDPOINT")
-	// }
-
 	var discord_message string
 	if message == "" {
-		discord_message = singer + "didn't add a comment"
+		discord_message = singer + " didn't add a comment"
 	} else {
-		discord_message = singer + "said: " + message
+		discord_message = singer + " said: " + message
 	}
 
 	// Create an empty buffer for body

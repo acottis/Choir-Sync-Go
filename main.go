@@ -295,7 +295,6 @@ func renameFileHandler(resW http.ResponseWriter, req *http.Request) response {
 
 // Http Handler for sending a recording to discord
 func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response {
-	temp_file_name := "tmp/tempfile.mp3"
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
@@ -314,6 +313,8 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 
 	message := req.PostFormValue("message")
 	singer := req.PostFormValue("singer_name")
+	file_name := req.PostFormValue("file_name")
+	temp_file_name := "tmp/" + file_name
 
 	recording, _, err := req.FormFile("recording")
 	if err != nil {

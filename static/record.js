@@ -244,7 +244,8 @@ const send_recording = (recording) => {
             const date_id = new Date(Date.now())
 
             const fd = new FormData();
-            fd.append('recording', recording.blob, `${send_song_name}_${singer_name}_${send_singing_part}_${date_id.toISOString()}${safari_mobile_flag}.mp3`)
+            fd.append('recording', recording.blob)
+            fd.append('file_name', `${send_song_name}_${singer_name}_${send_singing_part}_${date_id.toISOString()}${safari_mobile_flag}.mp3`)
             fd.append('singer_name', singer_name)
             fd.append('message', message)
             fd.append('password', password_entered)
@@ -255,6 +256,7 @@ const send_recording = (recording) => {
             })
             .then( res => res.json() )
             .then ( json_response => {
+                console.log(json_response.status)
                 if (json_response.status == "success"){
                     alert(`Recording received, thank you ${singer_name}!`)
                 }
