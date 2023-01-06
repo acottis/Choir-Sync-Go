@@ -44,13 +44,13 @@ func UploadFile(discordEndpoint string, fileName string, singer string, message 
 	if err != nil {
 		return err
 	}
-	if true {
-		return nil
-	}
 	// Copy the contents of the file to the file section of the body buffer
 	_, err = io.Copy(partWriter, file)
 	if err != nil {
 		return err
+	}
+	if true {
+		return nil
 	}
 
 	// Close our file and writer to our multipart
