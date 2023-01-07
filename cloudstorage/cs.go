@@ -251,33 +251,3 @@ func RenameFileInGoogle(
 	log.Printf("File %v renamed to %v.\n", origFileName, newFileName)
 	return nil
 }
-
-// Delete a file from a bucket
-func ChangeMetadataInGoogle(
-	bucketName string,
-	fileName string,
-) error {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx)
-	if err != nil {
-		return fmt.Errorf("storage.NewClient: %v", err)
-	}
-	defer client.Close()
-
-	ctx, cancel := context.WithTimeout(ctx, time.Second*10)
-	defer cancel()
-
-	o := client.Bucket(bucketName).Object(fileName)
-
-	// Update the object to set the metadata.
-	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
-		Metadata: map[string]string{
-			"group": "secret",
-		},
-	}
-	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
-		return fmt.Errorf("ObjectHandle(%q).Update: %v", fileName, err)
-	}
-
-	return nil
-}
