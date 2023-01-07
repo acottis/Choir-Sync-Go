@@ -405,7 +405,7 @@ func authenticateUser(password string) error {
 	if password == sgcPassword { // Good Passwords
 		groupName = "SGC"
 	} else if password == secretPassword {
-		groupName = "Secret"
+		groupName = "secret"
 	} else { // Bad password
 		log.Printf("Bad password")
 		return fmt.Errorf("auth_error: bad password")
@@ -420,7 +420,7 @@ func authenticateAdmin(password string) error {
 	if password == sgcPasswordAdmin { // Good Passwords
 		groupName = "SGC"
 	} else if password == secretPasswordAdmin {
-		groupName = "Secret"
+		groupName = "secret"
 	} else { // Bad password
 		log.Printf("Bad password")
 		return fmt.Errorf("auth_error: bad password")
