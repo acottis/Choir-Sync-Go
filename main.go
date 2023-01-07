@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"choir-sync/cloudstorage"
 	"choir-sync/discord"
@@ -176,6 +177,7 @@ func changeMetaHandler(resW http.ResponseWriter, req *http.Request) response {
 	bucketName := PROJECTNAME + ".appspot.com"
 
 	url := req.PostFormValue("url")
+	url = strings.Replace(url, "https://storage.googleapis.com/choir-sync-go.appspot.com/", "", -1)
 
 	if err := cloudstorage.ChangeMetadataInGoogle(bucketName, url); err != nil {
 		log.Print(err)
