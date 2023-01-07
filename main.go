@@ -82,6 +82,7 @@ func main() {
 	http.HandleFunc("/api/v1/deletefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "delete") })
 	http.HandleFunc("/api/v1/renamefile", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "rename") })
 	http.HandleFunc("/api/v1/uploadrecording", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "sendrec") })
+	http.HandleFunc("/api/v1/changemeta", func(w http.ResponseWriter, r *http.Request) { fileHandler(w, r, "changemeta") })
 
 	// Start listening on port specified
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
@@ -157,6 +158,8 @@ func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string
 		res = renameFileHandler(resW, req)
 	case "sendrec":
 		res = sendRecordingHandler(resW, req)
+	case "changemeta":
+		res = changeMetaHandler(resW, req)
 	}
 
 	bytes, err := json.Marshal(res)
@@ -166,6 +169,23 @@ func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string
 		resW.Header().Set("Content-Type", "application/json")
 		fmt.Fprint(resW, string(bytes))
 	}
+}
+
+// Http Handler for renaming a file
+func changeMetaHandler(resW http.ResponseWriter, req *http.Request) response {
+	bucketName := PROJECTNAME + ".appspot.com"
+
+	song_name := req.PostFormValue("song_name")
+	track_name := req.PostFormValue("track_name")
+
+	file_name := song_name + "_" + track_name + ".mp3"
+
+	if err := cloudstorage.ChangeMetadataInGoogle(bucketName, file_name); err != nil {
+		log.Print(err)
+		return response{Message: err.Error()}
+	}
+
+	return response{Message: "Rename Endpoint"}
 }
 
 // Http Handler for uploading a file
