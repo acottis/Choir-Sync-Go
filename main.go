@@ -175,12 +175,9 @@ func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string
 func changeMetaHandler(resW http.ResponseWriter, req *http.Request) response {
 	bucketName := PROJECTNAME + ".appspot.com"
 
-	song_name := req.PostFormValue("song_name")
-	track_name := req.PostFormValue("track_name")
+	url := req.PostFormValue("url")
 
-	file_name := song_name + "_" + track_name + ".mp3"
-
-	if err := cloudstorage.ChangeMetadataInGoogle(bucketName, file_name); err != nil {
+	if err := cloudstorage.ChangeMetadataInGoogle(bucketName, url); err != nil {
 		log.Print(err)
 		return response{Message: err.Error()}
 	}

@@ -138,7 +138,8 @@ rename_s.onclick= function (){
     }
     let counter = 0
     song_tracks.forEach( track => {
-        do_rename(song_to_change,track.part,new_name,track.part).then ( () => {
+        //do_rename(song_to_change,track.part,new_name,track.part).then ( () => {
+        do_rename(track.url).then ( () => {
             counter++
             if (counter == song_tracks.length){ //only show success once all requests finished
                 alert(`Success: ${song_to_change} renamed to ${new_name}.`)
@@ -316,7 +317,8 @@ const do_delete = (song, track) => {
         })
     })
 }
-const do_rename = (orig_song, orig_track, new_song, new_track) => {
+//const do_rename = (orig_song, orig_track, new_song, new_track) => {
+const do_rename = (url) => {
     return new Promise((resolve, reject) =>{
         const fd = new FormData();
         // fd.append('password', password_entered)
@@ -328,8 +330,7 @@ const do_rename = (orig_song, orig_track, new_song, new_track) => {
         //     method: "post",
         //     body: fd
         // })
-        fd.append('song_name', orig_song)
-        fd.append('track_name', orig_track)
+        fd.append('url', url)
         fetch('/api/v1/changemeta', {
             method: "post",
             body: fd
