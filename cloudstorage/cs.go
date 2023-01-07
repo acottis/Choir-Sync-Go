@@ -99,17 +99,14 @@ func GetSongsInBucket(bucketName string, groupName string) ([]song, error) {
 			songName := tmp[0]
 			part := strings.Split(tmp[1], ".")[0]
 			recordable := (objectAttrs.Metadata["recordable"] == "true")
-			//to implement: groups rather than boolean secret
-			//group := (objectAttrs.Metadata["group"])
-			secret := (objectAttrs.Metadata["secret"] == "true")
+			group := (objectAttrs.Metadata["group"])
 			url := fmt.Sprintf(
 				"https://storage.googleapis.com/%s/%s",
 				bucketName,
 				objectAttrs.Name,
 			)
 			//to implement: groups rather than boolean secret
-			//if group == groupName {
-			if (groupName == "Secret" && secret) || (groupName == "SGC" && !secret) {
+			if group == groupName {
 				songs = append(songs, song{
 					Song:       songName,
 					Part:       part,
@@ -160,7 +157,7 @@ func UploadFileToGoogle(
 	srcFileName string,
 	destFileName string,
 	recordable bool,
-	secret bool,
+	groupName string,
 ) error {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
@@ -186,7 +183,7 @@ func UploadFileToGoogle(
 	writer.ContentType = "audio/mpeg"
 	writer.Metadata = map[string]string{
 		"recordable": fmt.Sprintf("%v", recordable),
-		"secret":     fmt.Sprintf("%v", secret),
+		"group":      fmt.Sprintf("%v", groupName),
 	}
 	if _, err = io.Copy(writer, f); err != nil {
 		return fmt.Errorf("io.Copy: %v", err)

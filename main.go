@@ -212,7 +212,7 @@ func uploadFileHandler(resW http.ResponseWriter, req *http.Request) response {
 		return response{"upload_error: failed to write temporary file"}
 	}
 
-	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, false); err != nil {
+	if err := cloudstorage.UploadFileToGoogle(bucketName, temp_file_name, new_file_name, recordable, groupName); err != nil {
 		log.Print(err)
 		return response{"upload_error: failed to upload file"}
 	}
