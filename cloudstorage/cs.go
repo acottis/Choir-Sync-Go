@@ -272,7 +272,7 @@ func ChangeMetadataInGoogle(
 	// Update the object to set the metadata.
 	objectAttrsToUpdate := storage.ObjectAttrsToUpdate{
 		Metadata: map[string]string{
-			"group": "SGC",
+			"group": "secret",
 		},
 	}
 	if _, err := o.Update(ctx, objectAttrsToUpdate); err != nil {
