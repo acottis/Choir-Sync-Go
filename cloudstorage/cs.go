@@ -87,7 +87,6 @@ func GetSongsInBucket(bucketName string, groupName string) ([]song, error) {
 			var tmp []string
 			// Parse out just the last part in the full file path
 			tmp = strings.Split(objectAttrs.Name, "/")
-			log.Print(objectAttrs.Name)
 			rawFileName := tmp[len(tmp)-1]
 
 			// Split the song from the Parts
