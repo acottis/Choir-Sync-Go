@@ -172,7 +172,7 @@ func fileHandler(resW http.ResponseWriter, req *http.Request, requesttype string
 func uploadFileHandler(resW http.ResponseWriter, req *http.Request) response {
 	bucketName := PROJECTNAME + ".appspot.com"
 
-	temp_file_name := "tmp/tempfile.mp3"
+	temp_file_name := "/tmp/tempfile.mp3"
 
 	err := req.ParseMultipartForm(32 << 20)
 	if err != nil {
@@ -314,7 +314,7 @@ func sendRecordingHandler(resW http.ResponseWriter, req *http.Request) response 
 	message := req.PostFormValue("message")
 	singer := req.PostFormValue("singer_name")
 	file_name := req.PostFormValue("file_name")
-	temp_file_name := "tmp/" + file_name
+	temp_file_name := "/tmp/" + file_name
 
 	recording, _, err := req.FormFile("recording")
 	if err != nil {

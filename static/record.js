@@ -46,7 +46,13 @@ const do_recording = (test_only) => {
             timers["CanplayListenerOut"] = new Date();
             backing_track.removeEventListener("canplaythrough", recording_process)
 
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            navigator.mediaDevices.getUserMedia({
+                    audio:{ 
+                    channels: 1, 
+                    autoGainControl: false, 
+                    echoCancellation: false, 
+                    noiseSuppression: true 
+                } })
                 .then(stream => {
 
                     const audioChunks = [];
