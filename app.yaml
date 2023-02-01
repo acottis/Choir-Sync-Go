@@ -1,1 +1,2 @@
 runtime: go116
+secure: always
